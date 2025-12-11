@@ -3,7 +3,7 @@ name: ESP32 CI Build
 # Trigger the workflow on push or pull request to the main/master branch
 on:
   pull_request:
-    branches: [ "mai    n", "master" ]
+    branches: [ "main", "master" ]
 
 jobs:
   build:
