@@ -4,7 +4,9 @@ name: ESP32 CI Build
 on:
   pull_request:
     branches: [ "main", "master" ]
-
+  push:
+    tags:
+      - 'v*' 
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -39,6 +41,26 @@ jobs:
       - name: Install Library Dependencies
         run: pio pkg install
 
-      # 6. Compile the firmware
+
+      # 6. Set Firmware Name based on whether it's a tag or a test build
+      - name: Set Firmware Name
+        id: firmware_name
+        run: |
+          # Si c'est déclenché par un tag, on utilise le tag, sinon "test-build"
+          echo "VERSION=test-build" >> $GITHUB_ENV
+          if [[ $GITHUB_REF_TYPE == 'tag' ]]; then
+            echo "VERSION=${GITHUB_REF_NAME}" >> $GITHUB_ENV
+          fi
+
+      # 7. Compile the firmware
       - name: Build Firmware
         run: pio run -e esp32doit-devkit-v1
+
+      # 8. Rename the output firmware file
+      - name: Upload Firmware Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware-${{ env.VERSION }}
+          path: firmware-${{ env.VERSION }}.bin
+
+        
