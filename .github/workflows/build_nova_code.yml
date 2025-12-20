@@ -5,24 +5,27 @@ on:
   pull_request:
     branches: [ "main", "master" ]
   push:
+    branches: [ "main", "master" ]
     tags:
-      - 'v*' 
+      - 'v*'
+  workflow_dispatch:
+
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout the repository
+      # Checkout the repository
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # 2. Set up Python (PlatformIO Core is written in Python)
+      # Set up Python (PlatformIO Core is written in Python)
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.8'
+          python-version: '3.x'
 
-      # 3. Cache PlatformIO packages and libraries to speed up future builds
+      #  Cache PlatformIO packages and libraries to speed up future builds
       - name: Cache PlatformIO
         uses: actions/cache@v4
         with:
@@ -33,35 +36,44 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pio-
 
-      # 4. Install PlatformIO Core
+      # Install PlatformIO Core
       - name: Install PlatformIO Core
         run: pip install --upgrade platformio
 
-      # 5. Install libraries/dependencies defined in platformio.ini
+      # Install libraries/dependencies defined in platformio.ini
       - name: Install Library Dependencies
         run: pio pkg install
 
 
-      # 6. Set Firmware Name based on whether it's a tag or a test build
+      # Set Firmware Name based on whether it's a tag or a test build
       - name: Set Firmware Name
         id: firmware_name
         run: |
-          # if it's a tag build, use the tag name; otherwise, use 'test-build'
-          echo "VERSION=test-build" >> $GITHUB_ENV
           if [[ $GITHUB_REF_TYPE == 'tag' ]]; then
+            # If tag is v26.1.2, this sets VERSION=v26.1.2
             echo "VERSION=${GITHUB_REF_NAME}" >> $GITHUB_ENV
+          else
+            echo "VERSION=test-build" >> $GITHUB_ENV
           fi
+      
+      # Inject Version into Code
+      - name: Inject Version into Code
+        run: |
+          sed -i "s/VERSION=\"[^\"]*\"/VERSION=\"$VERSION\"/g" platformio.ini
+          
+          # Print file content :
+          cat platformio.ini | grep VERSION
 
-      # 7. Compile the firmware
+      # Compile the firmware
       - name: Build Firmware
         run: pio run -e esp32doit-devkit-v1
 
-        # 8. Rename the output firmware file 
+      # Rename the output firmware file 
       - name: Rename Firmware
         run: |
           mv .pio/build/esp32doit-devkit-v1/firmware.bin firmware-$VERSION.bin
 
-      # 9. Upload the compiled firmware as an artifact
+      # Upload the compiled firmware as an artifact
       - name: Upload Firmware Artifact
         uses: actions/upload-artifact@v4
         with:

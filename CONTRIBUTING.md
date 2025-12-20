@@ -39,7 +39,7 @@ The version is defined in `platformio.ini` via build flags. Before a major merge
 
 ```ini
 build_flags =
-    -D VERSION='-D VERSION="26.1.2"'
+    '-D VERSION="26.1.2"'
 ```
 
 >[!Caution]
