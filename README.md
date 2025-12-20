@@ -1,7 +1,7 @@
 # Nova_Code
 
 [![Latest Tag](https://img.shields.io/github/v/tag/VinciEcoDrive/Nova_Code)](https://github.com/VinciEcoDrive/Nova_Code/tags)
-![CI Build Status](https://github.com/VinciEcoDrive/Nova_Code/actions/workflows/build_codePE.yml/badge.svg)
+![CI Build Status](https://github.com/VinciEcoDrive/Nova_Code/actions/workflows/build_nova_code.yml/badge.svg)
 
 This repo contains the source code of our Efficiency Prototype NOVA competing at the [Shell Eco Marathon](https://www.shellecomarathon.com/).
 
