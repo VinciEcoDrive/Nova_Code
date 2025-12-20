@@ -1,4 +1,4 @@
-name: ESP32 CI Build
+name: build_nova_code
 
 # Trigger the workflow on push or pull request to the main/master branch
 on:
@@ -56,7 +56,12 @@ jobs:
       - name: Build Firmware
         run: pio run -e esp32doit-devkit-v1
 
-      # 8. Rename the output firmware file
+        # 8. Rename the output firmware file 
+      - name: Rename Firmware
+        run: |
+          mv .pio/build/esp32doit-devkit-v1/firmware.bin firmware-$VERSION.bin
+
+      # 9. Upload the compiled firmware as an artifact
       - name: Upload Firmware Artifact
         uses: actions/upload-artifact@v4
         with:

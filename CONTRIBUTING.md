@@ -1,4 +1,4 @@
-# Contributing to PE_Code
+# Contributing to Nova_Code
 
 Thank you for contributing to the Efficiency Prototype code! Please follow these guidelines to ensure our code remains stable and match-ready.
 
@@ -39,8 +39,12 @@ The version is defined in `platformio.ini` via build flags. Before a major merge
 
 ```ini
 build_flags =
-    -D VERSION=\"26.1.2\"
+    -D VERSION='-D VERSION="26.1.2"'
 ```
+
+>[!Caution]
+NO SPACE between `VERSION`, `=` and `YY.MINOR.PATCH`
+
 The variable `VERSION` is available inside the C++ code for display on the OLED/Serial for example.
 
 ## Releasing Firmware
@@ -50,10 +54,10 @@ To generate a "Production Ready" binary file (for example, before a race):
 2. Merge your code to main.
 3. Tag the commit on GitHub or via CLI:
 ```
-git tag v26.1.2
-git push origin v26.1.2
+git tag v<YY>.<MINOR>.<PATCH>
+git push origin v<YY>.<MINOR>.<PATCH>
 ```
-4. The CI pipeline will detect the tag, compile the code, and name the file `firmware-v26.1.2.bin`. 
+4. The CI pipeline will detect the tag, compile the code, and name the file `firmware-v<MAJOR>.<MINOR>.<PATCH>.bin`. 
 5. Download the binary from the GitHub Actions tab -> Artifacts
 
 ## Coding Standards 

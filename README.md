@@ -1,8 +1,9 @@
-# PE_Code
+# Nova_Code
 
-![CI Build Status](https://github.com/VinciEcoDrive/PE_Code/actions/workflows/build_esp32.yml/badge.svg)
+[![Latest Tag](https://img.shields.io/github/v/tag/VinciEcoDrive/Nova_Code)](https://github.com/VinciEcoDrive/Nova_Code/tags)
+![CI Build Status](https://github.com/VinciEcoDrive/Nova_Code/actions/workflows/build_codePE.yml/badge.svg)
 
-This repo contains the source code of our Efficiency Prototype competing on the [Shell Eco Marathon](https://www.shellecomarathon.com/).
+This repo contains the source code of our Efficiency Prototype NOVA competing at the [Shell Eco Marathon](https://www.shellecomarathon.com/).
 
 **Target Hardware:** ESP32 (DOIT DevKit V1)  
 **Framework:** Arduino via PlatformIO
@@ -21,7 +22,7 @@ This repo contains the source code of our Efficiency Prototype competing on the 
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/VinciEcoDrive/PE_Code.git
+git clone https://github.com/VinciEcoDrive/Nova_Code.git
 ```
 
 2. Open the folder in VS Code. Wait a moment for PlatformIO to initialize the environment and download dependencies.
