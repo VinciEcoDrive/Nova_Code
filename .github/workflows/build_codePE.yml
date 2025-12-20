@@ -46,7 +46,7 @@ jobs:
       - name: Set Firmware Name
         id: firmware_name
         run: |
-          # Si c'est déclenché par un tag, on utilise le tag, sinon "test-build"
+          # if it's a tag build, use the tag name; otherwise, use 'test-build'
           echo "VERSION=test-build" >> $GITHUB_ENV
           if [[ $GITHUB_REF_TYPE == 'tag' ]]; then
             echo "VERSION=${GITHUB_REF_NAME}" >> $GITHUB_ENV
