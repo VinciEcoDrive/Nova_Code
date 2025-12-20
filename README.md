@@ -1,7 +1,12 @@
-# Code_PE_2026
+# Nova_Code
 
+[![Latest Tag](https://img.shields.io/github/v/tag/VinciEcoDrive/Nova_Code)](https://github.com/VinciEcoDrive/Nova_Code/tags)
+![CI Build Status](https://github.com/VinciEcoDrive/Nova_Code/actions/workflows/build_nova_code.yml/badge.svg)
 
-This repo contains the source code of our Efficiency Prototype competing on the [Shell Eco Marathon](https://www.shellecomarathon.com/).
+This repo contains the source code of our Efficiency Prototype NOVA competing at the [Shell Eco Marathon](https://www.shellecomarathon.com/).
+
+**Target Hardware:** ESP32 (DOIT DevKit V1)  
+**Framework:** Arduino via PlatformIO
 
 ## Prerequisites
 
@@ -9,27 +14,44 @@ This repo contains the source code of our Efficiency Prototype competing on the 
 2. [PlatformIO Extension](https://marketplace.visualstudio.com/items?itemName=platformio.platformio-ide)
 3. [ESP32 Drivers](https://www.silabs.com/software-and-tools/usb-to-uart-bridge-vcp-drivers?tab=downloads)
 
-PIO will automatically download the required library.
+*Note: PlatformIO will automatically download the required libraries and toolchains when you open the project for the first time.*
 
 ## Usage
 
-### Getting Started
-
+### 1. Getting Started
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/VinciEcoDrive/Code_PE_2026.git
+git clone https://github.com/VinciEcoDrive/Nova_Code.git
 ```
 
-2. Open the folder in VS Code. PlatformIO should automatically detect the project and initialize the environment.
+2. Open the folder in VS Code. Wait a moment for PlatformIO to initialize the environment and download dependencies.
 
-### Building and Flashing
+### 2. Building and Flashing
 
-1.  Connect your ESP32 board to your computer.
-2.  Click on the PlatformIO icon in the sidebar.
-3.  Under `Project Tasks`, select `env:esp32doit-devkit-v1`.
-4.  Click `Build` to compile the code.
-5.  Click `Upload` to flash the code to the board.
+1. Connect your ESP32 board to your computer via USB.
+2. Click on the **PlatformIO Alien Icon** in the VS Code sidebar.
+3. Navigate to `Project Tasks` -> `esp32doit-devkit-v1`.
+4. Choose your action:
+   - Build: Compiles the code to check for errors.
+   - Upload: Compiles and flashes the binary to the board.
+   - Monitor: Opens the Serial Monitor (115200 baud).
+
+## CI & Artifacts
+
+This project uses GitHub Actions for Continuous Integration to automatically compile the firmware.
+
+### Versioning & Artifacts
+The CI pipeline automatically injects the version number into the firmware:
+- **Tagged Builds:** The firmware filename will be `firmware-vXX.X.X.bin` (matching the tag).
+- **Test Builds:** For regular commits or PRs, the filename will be `firmware-test-build.bin`.
+
+### Downloading the Firmware
+To download the compiled binary without setting up the development environment:
+1. Go to the [Actions Tab](https://github.com/VinciEcoDrive/Nova_Code/actions).
+2. Click on the latest successful workflow run.
+3. Scroll down to the **Artifacts** section.
+4. Download the `firmware-VERSION` zip file (contains the `.bin` file).
 
 ## Troubleshooting
 
@@ -39,12 +61,8 @@ git clone https://github.com/VinciEcoDrive/Code_PE_2026.git
 
 ## Contributing
 
-We welcome contributions! Please follow these steps:
-
-1. Create a feature branch (`git checkout -b feature/YourFeature`).
-2. Commit your changes (`git commit -m 'Add YourFeature'`).
-3. Push to the branch (`git push origin feature/YourFeature`).
-4. Open a Pull Request.
+We welcome contributions from the team!
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code style, the CI/CD pipeline, and our Versioning Strategy `(YEAR.x.x)`.
 
 Please ensure your code follows the project's style guidelines and includes appropriate tests.
 

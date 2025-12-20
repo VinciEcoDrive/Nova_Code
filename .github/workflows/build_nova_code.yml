@@ -1,0 +1,83 @@
+name: build_nova_code
+
+# Trigger the workflow on push or pull request to the main/master branch
+on:
+  pull_request:
+    branches: [ "main", "master" ]
+  push:
+    branches: [ "main", "master" ]
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the repository
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # Set up Python (PlatformIO Core is written in Python)
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      #  Cache PlatformIO packages and libraries to speed up future builds
+      - name: Cache PlatformIO
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.platformio
+            ~/.cache/pip
+          key: ${{ runner.os }}-pio-${{ hashFiles('**/platformio.ini') }}
+          restore-keys: |
+            ${{ runner.os }}-pio-
+
+      # Install PlatformIO Core
+      - name: Install PlatformIO Core
+        run: pip install --upgrade platformio
+
+      # Install libraries/dependencies defined in platformio.ini
+      - name: Install Library Dependencies
+        run: pio pkg install
+
+
+      # Set Firmware Name based on whether it's a tag or a test build
+      - name: Set Firmware Name
+        id: firmware_name
+        run: |
+          if [[ $GITHUB_REF_TYPE == 'tag' ]]; then
+            # If tag is v26.1.2, this sets VERSION=v26.1.2
+            echo "VERSION=${GITHUB_REF_NAME}" >> $GITHUB_ENV
+          else
+            echo "VERSION=test-build" >> $GITHUB_ENV
+          fi
+      
+      # Inject Version into Code
+      - name: Inject Version into Code
+        run: |
+          sed -i "s/VERSION=\"[^\"]*\"/VERSION=\"$VERSION\"/g" platformio.ini
+          
+          # Print file content :
+          cat platformio.ini | grep VERSION
+
+      # Compile the firmware
+      - name: Build Firmware
+        run: pio run -e esp32doit-devkit-v1
+
+      # Rename the output firmware file 
+      - name: Rename Firmware
+        run: |
+          mv .pio/build/esp32doit-devkit-v1/firmware.bin firmware-$VERSION.bin
+
+      # Upload the compiled firmware as an artifact
+      - name: Upload Firmware Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware-${{ env.VERSION }}
+          path: firmware-${{ env.VERSION }}.bin
+
+        
