@@ -37,6 +37,22 @@ git clone https://github.com/VinciEcoDrive/Nova_Code.git
    - Upload: Compiles and flashes the binary to the board.
    - Monitor: Opens the Serial Monitor (115200 baud).
 
+## CI & Artifacts
+
+This project uses GitHub Actions for Continuous Integration to automatically compile the firmware.
+
+### Versioning & Artifacts
+The CI pipeline automatically injects the version number into the firmware:
+- **Tagged Builds:** The firmware filename will be `firmware-vXX.X.X.bin` (matching the tag).
+- **Test Builds:** For regular commits or PRs, the filename will be `firmware-test-build.bin`.
+
+### Downloading the Firmware
+To download the compiled binary without setting up the development environment:
+1. Go to the [Actions Tab](https://github.com/VinciEcoDrive/Nova_Code/actions).
+2. Click on the latest successful workflow run.
+3. Scroll down to the **Artifacts** section.
+4. Download the `firmware-VERSION` zip file (contains the `.bin` file).
+
 ## Troubleshooting
 
 - If PlatformIO doesn't detect the project, try refreshing the workspace.

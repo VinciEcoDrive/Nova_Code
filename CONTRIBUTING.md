@@ -34,31 +34,24 @@ We use **CalVer** (Calendar Versioning) to align with the competition year.
 * `MINOR`: Major feature additions.
 * `PATCH`: Bug fixes.
 
-### How to update the version
-The version is defined in `platformio.ini` via build flags. Before a major merge or release, update this line:
-
-```ini
-build_flags =
-    '-D VERSION="26.1.2"'
-```
-
->[!Caution]
-NO SPACE between `VERSION`, `=` and `YY.MINOR.PATCH`
-
-The variable `VERSION` is available inside the C++ code for display on the OLED/Serial for example.
-
 ## Releasing Firmware
 To generate a "Production Ready" binary file (for example, before a race):
 
 1. Update the version in `platformio.ini`.
 2. Merge your code to main.
 3. Tag the commit on GitHub or via CLI:
-```
+```bash
 git tag v<YY>.<MINOR>.<PATCH>
 git push origin v<YY>.<MINOR>.<PATCH>
 ```
-4. The CI pipeline will detect the tag, compile the code, and name the file `firmware-v<MAJOR>.<MINOR>.<PATCH>.bin`. 
-5. Download the binary from the GitHub Actions tab -> Artifacts
+  - e.g.
+```bash
+git tag v26.2.1
+git push origin v26.2.1
+```
+
+1. The CI pipeline will detect the tag, compile the code, and name the file `firmware-v<MAJOR>.<MINOR>.<PATCH>.bin`. 
+2. Download the binary from the GitHub Actions tab -> Artifacts
 
 ## Coding Standards 
 
