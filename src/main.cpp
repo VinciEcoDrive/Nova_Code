@@ -68,12 +68,20 @@ const char* serverName = "http://telemetrie.vinciecodrive.fr/telemetry";
 // #define wifi_password   "" //"uhcd2281"////     "00000000"//"Tbucsi123"   //*c.r4UV@VfPn_0 "Antoine2"
 #define MQTT_PORT       1883
 #define MQTT_PUB        "pe/telemetrie"
+#define ENCODER_PIN  15   // GPIO où tu branches le canal A (à adapter)
+#define PPR 500         // Pulses par révolution de ton AMT10 (à confirmer)
+
+volatile unsigned long encoder_count = 0;   // Compte total des pulses
+unsigned long last_encoder_count = 0;
+unsigned long last_encoder_time = 0;
+float speed_rpm = 0;   // vitesse calculée en RPM
 
 //do NOT touch 
 bool DATA_FLAG = false;          //Flag use to send data to the telemetrie interrupt
 bool GPS_TIMER_FLAG = false;
 bool PWM_FLAG = false;
 bool BUTTON = false;             //Flag for the steeringwheel button
+bool USB_ONLY_MODE = false;   // true = moteur désactivé
 
 bool PWM_SLOWDOWN = true;
 bool DEBUG = true;               //Flag for Debuging or driver mode   
@@ -142,6 +150,12 @@ void init_SD_card(){
 }
 
 void PWM_controle(){     
+  if (USB_ONLY_MODE) {
+    dutyCycle = 0;               // coupe le PWM
+    ledcWrite(PWM_CHANNEL, 0);   // moteur OFF
+    return;                      // ne fait rien d’autre
+}
+
   //Delta controle the speed the dutyCycle will reach the potentiometer value
   uint16_t potentiometer_value = analogRead(speed_potentiometer_PIN);   //Get the potentiometer value
   if(potentiometer_value < 15) {
@@ -168,6 +182,12 @@ void PWM_controle(){
 } 
 
 void PWM_controle_slowdown(){
+  if (USB_ONLY_MODE) {
+    dutyCycle = 0;               // coupe le PWM
+    ledcWrite(PWM_CHANNEL, 0);   // moteur OFF
+    return;                      // ne fait rien d’autre
+}
+
   uint16_t potentiometer_value = analogRead(speed_potentiometer_PIN);   //Get the potentiometer value
   if(potentiometer_value < 15) {
     potentiometer_value = 0;                 //Use it only if it's greater than 15
@@ -331,6 +351,19 @@ void write_SD_card(){
     fileSD.close();                                                   //Close the file
   }
 }
+void check_power_source() {
+  // lire la tension batterie
+  float vin_batterie = (analogRead(tension_batterie_PIN) * 3.3) / 4095.0;
+  float battery_voltage = (vin_batterie * (resistor_1 + resistor_2)) / resistor_1; 
+
+  // si la batterie est absente (USB seulement)
+  if (battery_voltage < 5.0) {   // seuil à ajuster selon ta batterie
+    USB_ONLY_MODE = true;
+  } else {
+    USB_ONLY_MODE = false;
+  }
+}
+
 
 void display_screen_DEBUG(){
 
@@ -488,8 +521,27 @@ void telemetrie_task_loop(void *pvParameters) {
 
 void ECU_task_loop( void * pvParameters ){
   for(;;){ 
+      // --- Calcul vitesse AMT10 ---
+    unsigned long now = millis();
+    unsigned long delta_time = now - last_encoder_time;
+
+    if(delta_time >= 100) {  // toutes les 100 ms
+      unsigned long delta_count = encoder_count - last_encoder_count;
+      
+      // vitesse en RPM
+      speed_rpm = (delta_count * 600.0) / PPR;  
+      // delta_count pulses en 0,1 sec → *10 pour 1 sec, *60 pour minute → 600
+
+      last_encoder_count = encoder_count;
+      last_encoder_time = now;
+
+      // stocker dans DATA[6] pour télémétrie / SD / écran
+      DATA[6] = speed_rpm;
+    }
+
+    check_power_source();
     if (PWM_FLAG) {
-      Serial.println("PWM FLAG");
+      //Serial.println("PWM FLAG");
       if(PWM_SLOWDOWN) PWM_controle_slowdown();
       else PWM_controle();
       PWM_FLAG = false;
@@ -501,7 +553,7 @@ void ECU_task_loop( void * pvParameters ){
     if(MPU_FLAG) get_mpu();
     write_buffers();
     if(GPS_TIMER_FLAG){
-        Serial.println("GPS FLAG");
+        //Serial.println("GPS FLAG");
         get_gps();
         for(int i = 0; i < speed_buffer_size - 1; i++){
         speed_buffer[i] = speed_buffer[i + 1]; // shift values to the left
@@ -509,14 +561,34 @@ void ECU_task_loop( void * pvParameters ){
         speed_buffer[speed_buffer_size - 1] = speed;
         GPS_TIMER_FLAG = false;
     }
+    
     vTaskDelay(10);
   }
 }
+void SerialTask(void *pvParameters) {
+  for(;;) {
+    // Affiche la vitesse encodeur
+    Serial.print("Vitesse RPM: ");
+    Serial.println(DATA[6]);
+
+    // tu peux aussi afficher d'autres valeurs si tu veux
+    // Serial.print("Current: "); Serial.println(DATA[5]);
+    
+    vTaskDelay(500 / portTICK_PERIOD_MS); // 0,5 sec entre chaque affichage
+  }
+}
+
+void IRAM_ATTR encoderISR() {
+  encoder_count++;  // incrémente à chaque front montant
+}
+
 
 void setup() {
   Serial.begin(115200); //Start the serial with 115 200 Bauds
   Wire.begin();
   Serial.println("Start setup");
+  pinMode(ENCODER_PIN, INPUT_PULLUP);  // pull-up interne pour sécurité
+  attachInterrupt(digitalPinToInterrupt(ENCODER_PIN), encoderISR, RISING);
 
   pinMode(speed_potentiometer_PIN, INPUT);
   pinMode(temperature_MOSFET_PIN, INPUT);
@@ -571,12 +643,14 @@ void setup() {
   timerAlarmEnable(timer_PWM);
   timerAlarmEnable(timer_gps);  
   timerAlarmEnable(timer_data);
-
-  xTaskCreatePinnedToCore(telemetrie_task_loop,"Telemetrie",10000,NULL,1,&telemetrie_task,0);          /* pin task to core 0 */
+  
+  /*xTaskCreatePinnedToCore(telemetrie_task_loop,"Telemetrie",10000,NULL,1,&telemetrie_task,0);          /* pin task to core 0 */
   delay(100);
   xTaskCreatePinnedToCore(ECU_task_loop,"ECU",10000,NULL,1,&ECU,1);          /* pin task to core 1 */
-  delay(100);                   
+  delay(100); 
+  xTaskCreatePinnedToCore(SerialTask, "SerialTask", 2000, NULL, 1, NULL, 0);
+  delay(100);             
   Serial.println("End of SetUP");
 }
 
-void loop() {}
+void loop() { }
