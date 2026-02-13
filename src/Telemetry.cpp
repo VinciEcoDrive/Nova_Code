@@ -3,21 +3,26 @@
 //
 #include "Telemetry.hpp"
 
+// #region WiFi & MQTT Clients
 // Définitions des variables globales externes
 WiFiClient espClient;
 PubSubClient client(espClient);
 TaskHandle_t ECU;
 TaskHandle_t telemetrie_task;
+// #endregion
 
+// #region Telemetry Configuration
+uint8_t index_list = 0;         //Current index in buffers
+uint8_t httpResponseCode = 0;   //Server response code
+// #endregion
 
-uint8_t index_list = 0;         //Current index in the buffers
-
-uint8_t httpResponseCode = 0;   //Response from the server
-
-
+// #region MQTT Configuration
 const char* mqtt_server = "5.250.176.118";
 const char* mqtt_client_id = "ESP32Client";
+// #endregion
 
+// #region Telemetry Functions
+// Shifts buffer values & stores latest sensor
 void write_buffers(){
   index_list = (index_list - 1 + LIST_SIZE) % LIST_SIZE;          // Decrement index_list with wrap-around
   temperature_MOSFET_buffer[index_list] = temperature_MOSFET;
@@ -29,6 +34,7 @@ void write_buffers(){
   rotation_buffer[index_list] = rotation;
 }
 
+// Calculates average from buffer values
 float mean(const float* buffer) {
     double total = 0;
     for (int i = 0; i < LIST_SIZE; i++) {
@@ -37,6 +43,7 @@ float mean(const float* buffer) {
     return total / LIST_SIZE;
 }
 
+// Builds DATA array with averaged sensor values
 void write_DATA(){
   DATA[0] = mean(temperature_motor_buffer);
   DATA[1] = mean(temperature_batterie_buffer);
@@ -51,8 +58,7 @@ void write_DATA(){
   DATA[10] = mean(rotation_buffer);
 }
 
-
-
+// Publishes JSON data via MQTT if connected
 void telemetrie(){
   //Check if the WIFI is well connected
   if(WiFi.status()== WL_CONNECTED && client.connected()){
@@ -76,6 +82,7 @@ void telemetrie(){
   }
 }
 
+// Connects WiFi & MQTT to server
 void wifi_mqtt_connection(){
   Serial.println("Start connections");
   unsigned long connection_timer = millis();
@@ -99,8 +106,10 @@ void wifi_mqtt_connection(){
   }
   Serial.println("MQTT linked");
 }
+// #endregion
 
-
+// #region Task Loop
+// Main telemetry task loop for data transmission
 void telemetrie_task_loop(void *pvParameters) {
   for(;;){
     if(DATA_FLAG){
@@ -115,3 +124,4 @@ void telemetrie_task_loop(void *pvParameters) {
     vTaskDelay(10);
   }
 }
+// #endregion

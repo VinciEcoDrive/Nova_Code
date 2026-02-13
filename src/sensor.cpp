@@ -6,11 +6,14 @@
 #include "pinout.hpp"
 #include "variables.hpp"
 
+// #region Sensor Objects
 // Global variable definitions
 TinyGPSPlus gps;                //Init GPS object
 HardwareSerial gpsSerial(2);    //Init GPS Serial connection
 MPU9250 mpu;                    //Init MPU object
+// #endregion
 
+// #region Sensor Buffers & Variables
 float speed_buffer[speed_buffer_size] = {0};
 float speed;
 
@@ -31,8 +34,10 @@ float rotation;
 
 float latitude;
 float longitude;
+// #endregion
 
-
+// #region Temperature & Voltage Functions
+// Reads & converts temperature sensor values
 void get_temperatures(){
   int value_temperature_MOSFET_PIN = analogRead(temperature_MOSFET_PIN);
   float temperature_MOSFET_mv = ((value_temperature_MOSFET_PIN * 3.3) / 4095 ) * 1000;
@@ -47,6 +52,7 @@ void get_temperatures(){
   // temperature_motor = (temperature_motor_mv - 500) /10;
 }
 
+// Reads battery & motor voltages via dividers
 void get_tensions(){
   float vin_batterie = (analogRead(tension_batterie_PIN) * 3.3) / 4095.0;
   tension_batterie = (vin_batterie * (resistor_1 + resistor_2)) / resistor_1;
@@ -56,12 +62,16 @@ void get_tensions(){
   if (tension_motor < 0) tension_motor = 0;
 }
 
+// Calculates current from ACS770 sensor
 void get_current(){
   float value_current_sensor_PIN = analogRead(current_sensor_PIN);
   float voltage = ((5.0 / 4095.0) * value_current_sensor_PIN) - (VCC_ACS770 * 0.1);
   current = abs(voltage / SENSTA) - IERROM;
 }
+// #endregion
 
+// #region MPU & GPS Functions
+// Reads MPU9250 pitch for steering angle
 void get_mpu(){
   if (mpu.update()) {                             //Check if the MPU update new values
     rotation = (sw_inclination)*mpu.getPitch();   //Calculate the rotation of the steering wheel based on it's inclination and the pitch of the sensor
@@ -69,6 +79,7 @@ void get_mpu(){
   mpu.update();
 }
 
+// Extracts substring from NMEA sentence
 String scrap_gps(String trame, int index, int len){
   int virguleCount = 0;
   String result = "";
@@ -84,6 +95,7 @@ String scrap_gps(String trame, int index, int len){
   return result;
 }
 
+// Converts degrees/minutes to decimal coords
 float dmm_to_decimal(String coord, String direction) {
   float dmm = coord.toFloat();
   int degrees = (int)(dmm / 100);
@@ -95,6 +107,7 @@ float dmm_to_decimal(String coord, String direction) {
   return decimal;
 }
 
+// Parses GPS NMEA RMC & GGA sentences
 void get_gps(){
   String trame = "";
   String raw_speed;
@@ -126,3 +139,4 @@ void get_gps(){
     }
   }
 }
+// #endregion

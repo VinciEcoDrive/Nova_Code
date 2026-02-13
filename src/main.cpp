@@ -11,32 +11,36 @@
 #include "sensor.hpp"
 #include "PWM.hpp"
 
+// #region Timer Objects
+hw_timer_t *timer_data = NULL;       //Data interrupt timer
+hw_timer_t *timer_gps = NULL;        //GPS update timer
+hw_timer_t *timer_PWM = NULL;        //PWM control timer
+// #endregion
 
-//timer
-hw_timer_t *timer_data = NULL;       //Init the timer
-hw_timer_t *timer_gps = NULL;       //Init the timer
-hw_timer_t *timer_PWM = NULL;
-
-
-//interupt
+// #region Interrupt Handlers
+// Triggers data collection & telemetry
 void IRAM_ATTR timer_interrupt(){
   DATA_FLAG = true;
 }
 
+// Triggers GPS data parsing
 void IRAM_ATTR gps_interrupt(){
   GPS_TIMER_FLAG = true;
 }
 
+// Triggers PWM motor control update
 void IRAM_ATTR PWM_interrupt(){
   PWM_FLAG = true;
 }
 
+// Steering wheel button press handler
 void IRAM_ATTR button_press(){
   BUTTON = true;
 }
+// #endregion
 
-
-//Task loop for the ECU, it will read the sensors and update the PWM signal
+// #region Task Functions
+// Reads sensors & updates PWM every 10ms
 void ECU_task_loop( void * pvParameters ){
   for(;;){
     if (PWM_FLAG) {
@@ -63,8 +67,10 @@ void ECU_task_loop( void * pvParameters ){
     vTaskDelay(10);
   }
 }
+// #endregion
 
-//setup
+// #region Initialization
+// Configure pins, timers, & startup tasks
 void setup() {
   Serial.begin(115200); //Start the serial with 115 200 Bauds
   Wire.begin();
@@ -120,11 +126,13 @@ void setup() {
   timerAlarmEnable(timer_gps);
   timerAlarmEnable(timer_data);
 
-  xTaskCreatePinnedToCore(telemetrie_task_loop,"Telemetrie",10000,NULL,1,&telemetrie_task,0);          /* pin task to core 0 */
+  xTaskCreatePinnedToCore(telemetrie_task_loop,"Telemetrie",10000,NULL,1,&telemetrie_task,0);
   delay(100);
-  xTaskCreatePinnedToCore(ECU_task_loop,"ECU",10000,NULL,1,&ECU,1);          /* pin task to core 1 */
+  xTaskCreatePinnedToCore(ECU_task_loop,"ECU",10000,NULL,1,&ECU,1);
   delay(100);
   Serial.println("End of SetUP");
 }
+// #endregion
 
+// #region Main Loop
 void loop() {}

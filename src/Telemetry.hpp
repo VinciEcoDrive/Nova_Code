@@ -9,23 +9,34 @@
 
 #ifndef TELEMETRIE_HPP
 #define TELEMETRIE_HPP
-extern uint8_t index_list;         //Current index in the buffers
 
-extern uint8_t httpResponseCode ;   //Response from the server
+// #region Telemetry Variables
+extern uint8_t index_list;         //Current index in buffers
+extern uint8_t httpResponseCode ;   //Server response code
+// #endregion
 
+// #region MQTT Configuration
 extern const char* mqtt_server ;
 extern const char* mqtt_client_id;
+// #endregion
 
+// #region WiFi & MQTT Clients
 extern WiFiClient espClient;
 extern PubSubClient client;
 extern TaskHandle_t ECU;
 extern TaskHandle_t telemetrie_task;
+// #endregion
 
-
+// #region Telemetry Functions
+// Fills sensor buffers with latest values
 void write_buffers();
+// Averages buffers & stores in DATA array
 void write_DATA();
+// Publishes DATA via MQTT to server
 void telemetrie();
+// Establishes WiFi & MQTT connections
 void wifi_mqtt_connection();
+// Task loop for telemetry operations
 void telemetrie_task_loop(void *pvParameters);
 
 #endif

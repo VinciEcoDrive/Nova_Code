@@ -1,27 +1,36 @@
 #ifndef VARIABLES_HPP
 #define VARIABLES_HPP
 
+// #region WiFi & MQTT Configuration
 #define wifi_name       "OnePlus 8T"
 #define wifi_password   "uhcd2281"
 // #define wifi_name       "Shell Eco-marathon" //"R-Toukour" // //"OnePlus 8T" //   //"Miti-phone"  //PoleDeVinci_IFT"Antoine's iPhone"
 // #define wifi_password   "" //"uhcd2281"////     "00000000"//"Tbucsi123"   //*c.r4UV@VfPn_0 "Antoine2"
 #define MQTT_PORT       1883
 #define MQTT_PUB        "pe/telemetrie"
+// #endregion
 
-//do NOT touch
-extern bool DATA_FLAG;          //Flag use to send data to the telemetrie interrupt
-extern bool GPS_TIMER_FLAG;
-extern bool PWM_FLAG;
-extern bool BUTTON;             //Flag for the steeringwheel button
+// #region System Flags
+// Interrupt flags for timing & control events
+extern bool DATA_FLAG;          //Flag to send data to telemetry
+extern bool GPS_TIMER_FLAG;     //GPS update timer flag
+extern bool PWM_FLAG;           //PWM control timer flag
+extern bool BUTTON;             //Steering wheel button press
+// #endregion
 
-extern bool PWM_SLOWDOWN;
-extern bool DEBUG;               //Flag for Debuging or driver mode
-extern bool SERVER;              //Flag for the telemetrie sending
-extern bool GPS_FLAG;           //Flag for the GPS connection
-extern bool MPU_FLAG;           //Flag for the gyro sensor
-extern bool SCREEN_FLAG;        //Flag for the screen diplay
-extern bool SD_FLAG;            //Flag dor the SD card
+// #region Feature Flags
+// Enable/disable optional system features
+extern bool PWM_SLOWDOWN;       //Enable safer deceleration
+extern bool DEBUG;               //Debug or driver mode
+extern bool SERVER;              //Enable telemetry transmission
+extern bool GPS_FLAG;           //Enable GPS module
+extern bool MPU_FLAG;           //Enable gyro sensor
+extern bool SCREEN_FLAG;        //Enable display output
+extern bool SD_FLAG;            //Enable SD card logging
+// #endregion
+
+// #region Server Configuration
 extern const char* serverName;
-
+// #endregion
 
 #endif // VARIABLES_HPP
