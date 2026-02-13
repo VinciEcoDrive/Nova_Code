@@ -1,4 +1,7 @@
-#include "Telemetrie.hpp"
+//Telemetrie FILE
+// DO NOT TOUCH
+//
+#include "Telemetry.hpp"
 
 // Définitions des variables globales externes
 WiFiClient espClient;
@@ -10,6 +13,7 @@ TaskHandle_t telemetrie_task;
 uint8_t index_list = 0;         //Current index in the buffers
 
 uint8_t httpResponseCode = 0;   //Response from the server
+
 
 const char* mqtt_server = "5.250.176.118";
 const char* mqtt_client_id = "ESP32Client";

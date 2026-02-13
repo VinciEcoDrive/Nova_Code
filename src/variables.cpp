@@ -1,3 +1,5 @@
+//Variables file
+// YOU CAN TOUCH THIS FILE, BUT BE CAREFUL
 #include "variables.hpp"
 
 // Define global variables
@@ -15,4 +17,3 @@ bool SCREEN_FLAG = false;        //Flag for the screen diplay
 bool SD_FLAG = false;            //Flag dor the SD card
 const char* serverName = "http://telemetrie.vinciecodrive.fr/telemetry";
 
-float DATA[11] = {0}; // TMOT- TBAT - TMOS - VMOT - VBAT - CUR - SPD - LNG - LAT - DTY - GYRO

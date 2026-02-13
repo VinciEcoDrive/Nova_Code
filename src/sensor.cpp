@@ -1,3 +1,7 @@
+//SENSOR FILE
+// DO NOT TOUCH
+//
+
 #include "sensor.hpp"
 #include "pinout.hpp"
 #include "variables.hpp"

@@ -1,3 +1,7 @@
+//SD FILE
+// DO NOT TOUCH
+//
+
 #include <FS.h>
 #include <SD.h>
 #include "pinout.hpp"
@@ -7,7 +11,7 @@
 String path;
 File fileSD;
 uint8_t indexSD = 0;
-
+float DATA[11] = {0}; // TMOT- TBAT - TMOS - VMOT - VBAT - CUR - SPD - LNG - LAT - DTY - GYRO
 void init_SD_card(){
   if(!SD.begin(CS_PIN)){return;}                                        //Begin the communication
   indexSD = 0;                                                  //Set index to 0

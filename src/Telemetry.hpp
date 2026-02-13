@@ -21,6 +21,7 @@ extern PubSubClient client;
 extern TaskHandle_t ECU;
 extern TaskHandle_t telemetrie_task;
 
+
 void write_buffers();
 void write_DATA();
 void telemetrie();

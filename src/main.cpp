@@ -6,16 +6,19 @@
 #include <HardwareSerial.h>
 #include "variables.hpp"
 #include "pinout.hpp"
+#include "Telemetry.hpp"
 #include "SD.hpp"
 #include "sensor.hpp"
 #include "PWM.hpp"
-#include "Telemetrie.hpp"
 
 
+//timer
 hw_timer_t *timer_data = NULL;       //Init the timer
 hw_timer_t *timer_gps = NULL;       //Init the timer
 hw_timer_t *timer_PWM = NULL;
 
+
+//interupt
 void IRAM_ATTR timer_interrupt(){
   DATA_FLAG = true;
 }
@@ -32,6 +35,8 @@ void IRAM_ATTR button_press(){
   BUTTON = true;
 }
 
+
+//Task loop for the ECU, it will read the sensors and update the PWM signal
 void ECU_task_loop( void * pvParameters ){
   for(;;){
     if (PWM_FLAG) {
@@ -59,6 +64,7 @@ void ECU_task_loop( void * pvParameters ){
   }
 }
 
+//setup
 void setup() {
   Serial.begin(115200); //Start the serial with 115 200 Bauds
   Wire.begin();

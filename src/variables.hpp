@@ -23,6 +23,5 @@ extern bool SCREEN_FLAG;        //Flag for the screen diplay
 extern bool SD_FLAG;            //Flag dor the SD card
 extern const char* serverName;
 
-extern float DATA[11]; // TMOT- TBAT - TMOS - VMOT - VBAT - CUR - SPD - LNG - LAT - DTY - GYRO
 
 #endif // VARIABLES_HPP
