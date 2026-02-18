@@ -6,14 +6,14 @@
 #include "pinout.hpp"
 #include "variables.hpp"
 
-// #region Sensor Objects
+#pragma region Sensor Objects
 // Global variable definitions
 TinyGPSPlus gps;                //Init GPS object
 HardwareSerial gpsSerial(2);    //Init GPS Serial connection
 MPU9250 mpu;                    //Init MPU object
-// #endregion
+#pragma endregion
 
-// #region Sensor Buffers & Variables
+#pragma region Sensor Buffers & Variables
 float speed_buffer[speed_buffer_size] = {0};
 float speed;
 
@@ -34,9 +34,9 @@ float rotation;
 
 float latitude;
 float longitude;
-// #endregion
+#pragma endregion
 
-// #region Temperature & Voltage Functions
+#pragma region Temperature & Voltage Functions
 // Reads & converts temperature sensor values
 void get_temperatures(){
   int value_temperature_MOSFET_PIN = analogRead(temperature_MOSFET_PIN);
@@ -68,9 +68,9 @@ void get_current(){
   float voltage = ((5.0 / 4095.0) * value_current_sensor_PIN) - (VCC_ACS770 * 0.1);
   current = abs(voltage / SENSTA) - IERROM;
 }
-// #endregion
+#pragma endregion
 
-// #region MPU & GPS Functions
+#pragma region MPU & GPS Functions
 // Reads MPU9250 pitch for steering angle
 void get_mpu(){
   if (mpu.update()) {                             //Check if the MPU update new values
@@ -139,4 +139,4 @@ void get_gps(){
     }
   }
 }
-// #endregion
+#pragma endregion

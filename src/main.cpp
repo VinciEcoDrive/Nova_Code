@@ -11,13 +11,13 @@
 #include "sensor.hpp"
 #include "PWM.hpp"
 
-// #region Timer Objects
+#pragma region Timer Objects
 hw_timer_t *timer_data = NULL;       //Data interrupt timer
 hw_timer_t *timer_gps = NULL;        //GPS update timer
 hw_timer_t *timer_PWM = NULL;        //PWM control timer
-// #endregion
+#pragma endregion
 
-// #region Interrupt Handlers
+#pragma region Interrupt Handlers
 // Triggers data collection & telemetry
 void IRAM_ATTR timer_interrupt(){
   DATA_FLAG = true;
@@ -37,9 +37,9 @@ void IRAM_ATTR PWM_interrupt(){
 void IRAM_ATTR button_press(){
   BUTTON = true;
 }
-// #endregion
+#pragma endregion
 
-// #region Task Functions
+#pragma region Task Functions
 // Reads sensors & updates PWM every 10ms
 void ECU_task_loop( void * pvParameters ){
   for(;;){
@@ -67,9 +67,9 @@ void ECU_task_loop( void * pvParameters ){
     vTaskDelay(10);
   }
 }
-// #endregion
+#pragma endregion
 
-// #region Initialization
+#pragma region Initialization
 // Configure pins, timers, & startup tasks
 void setup() {
   Serial.begin(115200); //Start the serial with 115 200 Bauds
@@ -132,7 +132,7 @@ void setup() {
   delay(100);
   Serial.println("End of SetUP");
 }
-// #endregion
+#pragma endregion
 
-// #region Main Loop
+#pragma region Main Loop
 void loop() {}

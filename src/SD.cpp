@@ -8,14 +8,14 @@
 #include "variables.hpp"
 #include "SD.hpp"
 
-// #region SD Card Variables
+#pragma region SD Card Variables
 String path;
 File fileSD;
 uint8_t indexSD = 0;
 float DATA[11] = {0}; // TMOT-TBAT-TMOS-VMOT-VBAT-CUR-SPD-LNG-LAT-DTY-GYRO
-// #endregion
+#pragma endregion
 
-// #region SD Card Functions
+#pragma region SD Card Functions
 // Sets up SD card & creates new CSV file
 void init_SD_card(){
   if(!SD.begin(CS_PIN)){return;}                                        //Begin the communication
@@ -40,4 +40,4 @@ void write_SD_card(){
     fileSD.close();                                                   //Close the file
   }
 }
-// #endregion
+#pragma endregion

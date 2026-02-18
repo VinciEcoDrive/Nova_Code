@@ -4,12 +4,12 @@
 
 #include "PWM.hpp"
 
-// #region PWM Configuration
+#pragma region PWM Configuration
 int PWM_CHANNEL = 10;
 uint16_t dutyCycle = 5;         //Duty Cycle for motor control
-// #endregion
+#pragma endregion
 
-// #region PWM Control Functions
+#pragma region PWM Control Functions
 // Controls motor speed via potentiometer value
 void PWM_controle(){
   //Delta controle the speed the dutyCycle will reach the potentiometer value
@@ -61,4 +61,4 @@ void PWM_controle_slowdown(){
       //If the Duty Cycle is greater than the potentiometer value, give the potentiometer value to the                                                           //duty cycle to efficently stop the motor asservissement
   ledcWrite(PWM_CHANNEL, dutyCycle);                                        //Write the PWM signal
 }
-// #endregion
+#pragma endregion

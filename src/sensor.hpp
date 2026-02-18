@@ -6,7 +6,7 @@
 #ifndef SENSOR_HPP
 #define SENSOR_HPP
 
-// #region Sensor Configuration Constants
+#pragma region Sensor Configuration Constants
 #define VCC_ACS770      5.041   //VCC of the current sensor
 #define SENSTA          0.08    //Sensisivity for the current sensor
 #define IERROM          0.120   //Magnetic offset error
@@ -16,15 +16,15 @@
 #define delta           10      //PWM acceleration step
 #define resistor_1      6.2     //Voltage divider resistor 1
 #define resistor_2      100.0   //Voltage divider resistor 2
-// #endregion
+#pragma endregion
 
-// #region Sensor Objects & Serial
+#pragma region Sensor Objects & Serial
 extern TinyGPSPlus gps; //Init GPS object
 extern HardwareSerial gpsSerial; //Init GPS Serial connection
 extern MPU9250 mpu; //Init MPU object
-// #endregion
+#pragma endregion
 
-// #region Sensor Buffers & Variables
+#pragma region Sensor Buffers & Variables
 extern float temperature_MOSFET_buffer[LIST_SIZE];
 extern float temperature_MOSFET;
 extern float temperature_batterie_buffer[LIST_SIZE];
@@ -44,9 +44,9 @@ extern float longitude;
 const uint8_t speed_buffer_size = 5;
 extern float speed_buffer[speed_buffer_size];
 extern float speed;
-// #endregion
+#pragma endregion
 
-// #region Sensor Reading Functions
+#pragma region Sensor Reading Functions
 // Reads MOSFET & battery temperatures
 void get_temperatures();
 // Reads motor & battery voltages
@@ -57,6 +57,6 @@ void get_current();
 void get_mpu();
 // Parses GPS NMEA sentences data
 void get_gps();
-// #endregion
+#pragma endregion
 
 #endif // SENSOR_HPP

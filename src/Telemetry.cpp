@@ -3,25 +3,25 @@
 //
 #include "Telemetry.hpp"
 
-// #region WiFi & MQTT Clients
+#pragma region WiFi & MQTT Clients
 // Définitions des variables globales externes
 WiFiClient espClient;
 PubSubClient client(espClient);
 TaskHandle_t ECU;
 TaskHandle_t telemetrie_task;
-// #endregion
+#pragma endregion
 
-// #region Telemetry Configuration
+#pragma region Telemetry Configuration
 uint8_t index_list = 0;         //Current index in buffers
 uint8_t httpResponseCode = 0;   //Server response code
-// #endregion
+#pragma endregion
 
-// #region MQTT Configuration
+#pragma region MQTT Configuration
 const char* mqtt_server = "5.250.176.118";
 const char* mqtt_client_id = "ESP32Client";
-// #endregion
+#pragma endregion
 
-// #region Telemetry Functions
+#pragma region Telemetry Functions
 // Shifts buffer values & stores latest sensor
 void write_buffers(){
   index_list = (index_list - 1 + LIST_SIZE) % LIST_SIZE;          // Decrement index_list with wrap-around
@@ -106,9 +106,9 @@ void wifi_mqtt_connection(){
   }
   Serial.println("MQTT linked");
 }
-// #endregion
+#pragma endregion
 
-// #region Task Loop
+#pragma region Task Loop
 // Main telemetry task loop for data transmission
 void telemetrie_task_loop(void *pvParameters) {
   for(;;){
@@ -124,4 +124,4 @@ void telemetrie_task_loop(void *pvParameters) {
     vTaskDelay(10);
   }
 }
-// #endregion
+#pragma endregion
