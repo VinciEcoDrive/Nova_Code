@@ -3,14 +3,24 @@
 #include "variables.hpp"
 #include "pinout.hpp"
 
-#pragma region PWM Configuration
+// PWM
 extern int PWM_CHANNEL;
 extern uint16_t dutyCycle;
 
-#pragma endregion
+// PID parameters
+extern float kp;
+extern float ki;
+extern float kd;
+extern float Ts;
+extern float alpha;
 
-#pragma region PWM Control Functions
-// Manages motor PWM with speed & current limits
+extern float integral;
+extern float old_ef;
+
+extern float MotorSpeedreference;
+extern float MotorSpeedreceive;
+
+void IRAM_ATTR encoderISR();
 void PWM_controle();
-// Applies reduced delta for safer deceleration
 void PWM_controle_slowdown();
+float calcAlphaEMA(float fn);

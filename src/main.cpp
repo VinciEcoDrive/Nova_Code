@@ -76,7 +76,7 @@ void setup() {
   Wire.begin();
   Serial.println("Start setup");
 
-  pinMode(speed_potentiometer_PIN, INPUT);
+  pinMode(Pressed_Button_PIN, INPUT);
   pinMode(temperature_MOSFET_PIN, INPUT);
   pinMode(temperature_batterie_PIN, INPUT);
   // pinMode(temperature_motor_PIN, INPUT);
@@ -88,6 +88,9 @@ void setup() {
   pinMode(TX1_PIN, INPUT);
   pinMode(RX2_PIN, INPUT);
   pinMode(TX2_PIN, INPUT);
+
+  pinMode(ENC_A, INPUT_PULLUP); 
+  attachInterrupt(digitalPinToInterrupt(ENC_A), encoderISR, RISING);  
 
   pinMode(PWM_PIN, OUTPUT);
   ledcSetup(PWM_CHANNEL, 17200, 12);

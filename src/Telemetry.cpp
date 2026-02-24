@@ -17,7 +17,7 @@ uint8_t httpResponseCode = 0;   //Server response code
 #pragma endregion
 
 #pragma region MQTT Configuration
-const char* mqtt_server = "5.250.176.118";
+const char* mqtt_server = "37.59.113.108";
 const char* mqtt_client_id = "ESP32Client";
 #pragma endregion
 
