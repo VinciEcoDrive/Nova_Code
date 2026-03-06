@@ -5,7 +5,7 @@
 #define wifi_name       "OnePlus 8T"
 #define wifi_password   "uhcd2281"
 // #define wifi_name       "Shell Eco-marathon" //"R-Toukour" // //"OnePlus 8T" //   //"Miti-phone"  //PoleDeVinci_IFT"Antoine's iPhone"
-// #define wifi_password   "" //"uhcd2281"////     "00000000"//"Tbucsi123"   //*c.r4UV@VfPn_0 "Antoine2"
+// #define wifi_password   "" //"uhcd2281"////     "00000000"//"Tbucsi123"   //*c.r4UV@VfPn_0 // "Antoine2"
 #define MQTT_PORT       1883
 #define MQTT_PUB        "pe/telemetrie"
 #pragma endregion
@@ -31,6 +31,13 @@ extern bool SD_FLAG;            //Enable SD card logging
 
 #pragma region Server Configuration
 extern const char* serverName;
+#pragma endregion
+
+#pragma GPS Variable 
+extern TinyGPSPlus gps;
+extern HardwareSerial gpsSerial;
+extern double latitude;
+extern double longitude;
 #pragma endregion
 
 #endif // VARIABLES_HPP
