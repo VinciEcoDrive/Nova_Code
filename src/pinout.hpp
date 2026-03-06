@@ -11,7 +11,7 @@
 #define temperature_batterie_PIN  35
 #define temperature_motor_PIN     32
 #define tension_batterie_PIN      33
-#define tension_motor_PIN         32 
+#define tension_motor_PIN         39 
 #define current_sensor_PIN        36
 #define ENC_A                     26
 // #endregion

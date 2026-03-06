@@ -4,7 +4,7 @@
 
 #pragma region Configuration et Variables
 
-int PWM_CHANNEL = 11; 
+int PWM_CHANNEL = 16; 
 uint16_t dutyCycle = 5; 
 float kp = 0.07; 
 float ki = 18.5;
@@ -63,20 +63,16 @@ void updateMotorSpeed() { //Calculate motor current speed with encodor impulsion
 //https://tttapa.github.io/Pages/Arduino/Control-Theory/Motor-Fader/PID-Cpp-Implementation.html inspiration du PID
 void PWM_controle() {
     updateMotorSpeed();
-    bool Pressed_Button;
-    int threshold = 1000; 
-    int value_Pressed_BUTTON_PIN = analogRead(Pressed_Button_PIN);
-    float voltage_Pressed_Button = (((value_Pressed_BUTTON_PIN * 5) / 4095) *1000);
-
-    if (voltage_Pressed_Button < threshold){ //threshold / security to detect pressed button
-      Pressed_Button = false;
+    bool Pressed_button;
+    if(digitalRead(Pressed_Button_PIN) == HIGH){ //threshold / security to detect pressed button
+      Pressed_button = false;
     }
-    else{ Pressed_Button = true;}
+    else{ Pressed_button = true;} 
 
     //if(digitalRead(Pressed_Button_PIN) == HIGH){Pressed_Button = true;} else {Pressed_Button = false;}
        
     if(current < 15) { //Avoid noise
-        Pressed_Button = false;
+        Pressed_button = false;
         dutyCycle = 0;
     }
 
@@ -89,7 +85,7 @@ void PWM_controle() {
         integral = 0; // Reinitialize Pid to 0 
     }
     else if(current <= limited_current) {
-        if(Pressed_Button) {
+        if(Pressed_button) {
             
             float error = MotorSpeedreference - MotorSpeedreceive; // difference between wanted and currant speed 
           
