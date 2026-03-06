@@ -32,8 +32,8 @@ float current;
 float rotation_buffer[LIST_SIZE] = {0};
 float rotation;
 
-float latitude;
-float longitude;
+double latitude;
+double longitude;
 #pragma endregion
 
 #pragma region Temperature & Voltage Functions
