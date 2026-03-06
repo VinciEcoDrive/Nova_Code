@@ -33,4 +33,11 @@ extern bool SD_FLAG;            //Enable SD card logging
 extern const char* serverName;
 #pragma endregion
 
+#pragma GPS variable
+extern TinyGPSPlus gps;
+extern HardwareSerial gpsSerial;
+extern double latitude;
+extern double longitude;
+#pragma endregion
+
 #endif // VARIABLES_HPP
