@@ -135,4 +135,22 @@ void setup() {
 #pragma endregion
 
 #pragma region Main Loop
-void loop() {}
+void loop() {
+  get_gps();
+    
+    static unsigned long lastDisplay = 0;
+    if (millis() - lastDisplay > 2000) { // Affichage toutes les 2 secondes
+        lastDisplay = millis();
+        
+        if (latitude != 0.0 || longitude != 0.0) {
+            Serial.print("Position: ");
+            Serial.print(latitude, 6);
+            Serial.print(", ");
+            Serial.println(longitude, 6);
+        } else {
+            Serial.println("Recherche du signal GPS...");
+        }
+    }
+    
+    delay(10);
+}
