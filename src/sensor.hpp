@@ -1,4 +1,5 @@
 #include <Adafruit_Sensor.h>
+#include <HardwareSerial.h> 
 #include <TinyGPS++.h>
 #include <Wire.h>
 #include <MPU9250.h>
@@ -19,9 +20,9 @@
 #pragma endregion
 
 #pragma region Sensor Objects & Serial
-extern TinyGPSPlus gps; //Init GPS object
-extern HardwareSerial gpsSerial; //Init GPS Serial connection
-extern MPU9250 mpu; //Init MPU object
+extern TinyGPSPlus gps;
+extern HardwareSerial gpsSerial;
+extern MPU9250 mpu;
 #pragma endregion
 
 #pragma region Sensor Buffers & Variables
