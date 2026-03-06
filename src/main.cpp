@@ -135,9 +135,7 @@ void setup() {
 #pragma endregion
 
 #pragma region Main Loop
-void loop() {
-  get_gps();
-    
+void loop() {  
     static unsigned long lastDisplay = 0;
     if (millis() - lastDisplay > 2000) { // Affichage toutes les 2 secondes
         lastDisplay = millis();
