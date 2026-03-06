@@ -88,11 +88,6 @@ void setup() {
   pinMode(TX1_PIN, INPUT);
   pinMode(RX2_PIN, INPUT);
   pinMode(TX2_PIN, INPUT);
-  ledcSetup(PWM_CHANNEL, 20000, 10); // canal, frequency, resolution
-  ledcAttachPin(PWM_PIN, PWM_CHANNEL); // link GPIO27 to canal
-  pinMode(Pressed_Button_PIN, INPUT);
-  attachInterrupt(digitalPinToInterrupt(ENC_A), encoderISR, RISING);
-
   pinMode(ENC_A, INPUT_PULLUP); 
   attachInterrupt(digitalPinToInterrupt(ENC_A), encoderISR, RISING);  
 
@@ -101,8 +96,8 @@ void setup() {
   ledcAttachPin(PWM_PIN, PWM_CHANNEL);                     //Attach the PWM pin to generate a PWM signal, frequency : 17200, resolution: 12 (nb of bits)
   Serial.println("PWM pin attached");
 
-  pinMode(button_PIN, INPUT);
-  attachInterrupt(digitalPinToInterrupt(button_PIN), button_press, RISING); //Attach the steering wheel button to interrupt
+  pinMode(Pressed_Button_PIN, INPUT);
+  attachInterrupt(digitalPinToInterrupt(Pressed_Button_PIN), button_press, RISING); //Attach the steering wheel button to interrupt
   Serial.println("Pin interrupt button");
 
   timer_data = timerBegin(0, 80, true);                          // Timer 0, clock divisor 80
