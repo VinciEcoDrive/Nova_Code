@@ -32,8 +32,8 @@ float current;
 float rotation_buffer[LIST_SIZE] = {0};
 float rotation;
 
-float latitude;
-float longitude;
+double latitude = 0.0;
+double longitude = 0.0;
 #pragma endregion
 
 #pragma region Temperature & Voltage Functions
@@ -80,63 +80,74 @@ void get_mpu(){
 }
 
 // Extracts substring from NMEA sentence
-String scrap_gps(String trame, int index, int len){
-  int virguleCount = 0;
-  String result = "";
-  for (int i = 0; i < trame.length(); i++) {
-    if (trame.charAt(i) == ',') {
-      virguleCount++;
-      if(virguleCount == index){
-        result = trame.substring(i + 1, i + len);
-        break;
-      }
+String getField(String trame, int fieldIndex) {
+    int virguleCount = 0;
+    int startPos = 0;
+    int endPos;
+    
+    // Trouver le début du champ
+    for (int i = 0; i < trame.length(); i++) {
+        if (trame.charAt(i) == ',') {
+            virguleCount++;
+            if (virguleCount == fieldIndex) {
+                startPos = i + 1;
+                break;
+            }
+        }
     }
-  }
-  return result;
+    
+    // Si on a trouvé le début, trouver la fin (prochaine virgule ou fin de chaîne)
+    if (virguleCount >= fieldIndex) {
+        endPos = trame.indexOf(',', startPos);
+        if (endPos == -1) {
+            endPos = trame.length();
+        }
+        return trame.substring(startPos, endPos);
+    }
+    
+    return "";
 }
 
 // Converts degrees/minutes to decimal coords
-float dmm_to_decimal(String coord, String direction) {
-  float dmm = coord.toFloat();
-  int degrees = (int)(dmm / 100);
-  float minutes = dmm - (degrees * 100);
-  float decimal = degrees + (minutes / 60.0);
-  if (direction == "S" || direction == "W") {
-    decimal *= -1;
-  }
-  return decimal;
+double dmm_to_decimal(String coord, String direction) {
+    if (coord.length() == 0) return 0.0;
+    
+    double dmm = coord.toDouble();
+    int degrees = (int)(dmm / 100);
+    double minutes = dmm - (degrees * 100);
+    double decimal = degrees + (minutes / 60.0);
+    
+    if (direction == "S" || direction == "W") {
+        decimal *= -1;
+    }   
+    return decimal;
 }
 
 // Parses GPS NMEA RMC & GGA sentences
 void get_gps(){
-  String trame = "";
-  String raw_speed;
-  String raw_latitude;
-  String latitude_letter;
-  String raw_longitude;
-  String longitude_letter;
-
-  while(gpsSerial.available() > 0){
-    char c = gpsSerial.read();
-    if (c == '\n') {
-      if (trame.startsWith("$GPRMC")) {
-        raw_speed = scrap_gps(trame, 7, 5);
-        speed = raw_speed.toFloat() * 1.852;
-      }
-      else if (trame.startsWith("$GPGGA")) {
-        raw_latitude = scrap_gps(trame, 2, 9);
-        latitude_letter = scrap_gps(trame, 3, 1);
-        latitude = dmm_to_decimal(raw_latitude, latitude_letter);
-
-        raw_longitude = scrap_gps(trame, 4, 9);
-        longitude_letter = scrap_gps(trame, 5, 1);
-        longitude = dmm_to_decimal(raw_longitude, longitude_letter);
-      }
-      trame = "";
+    while (gpsSerial.available() > 0) {
+        String trame = gpsSerial.readStringUntil('\n');
+        trame.trim(); // Enlève les caractères de retour chariot
+        
+        if (trame.startsWith("$GPGGA")) {
+            String raw_lat = getField(trame, 2);  // Champ 2 = latitude
+            String lat_dir = getField(trame, 3);  // Champ 3 = direction latitude
+            String raw_lng = getField(trame, 4);  // Champ 4 = longitude
+            String lng_dir = getField(trame, 5);  // Champ 5 = direction longitude
+            
+            // Vérifier que les données sont valides
+            if (raw_lat.length() > 0 && raw_lng.length() > 0) {
+                latitude = dmm_to_decimal(raw_lat, lat_dir);
+                longitude = dmm_to_decimal(raw_lng, lng_dir);
+                
+                // Debug - afficher les données brutes
+                Serial.println("Trame GPGGA reçue");
+                Serial.print("Lat brute: "); Serial.print(raw_lat);
+                Serial.print(" Dir: "); Serial.print(lat_dir);
+                Serial.print(" Lng brute: "); Serial.print(raw_lng);
+                Serial.print(" Dir: "); Serial.println(lng_dir);
+            }
+        }
     }
-    else if (c != '\r') {
-      trame += c;
-    }
-  }
 }
-#pragma endregion
+
