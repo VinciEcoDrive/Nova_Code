@@ -34,7 +34,6 @@ extern const char* serverName;
 #pragma endregion
 
 #pragma GPS variable
-extern TinyGPSPlus gps;
 extern HardwareSerial gpsSerial;
 extern double latitude;
 extern double longitude;
