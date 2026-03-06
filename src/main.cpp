@@ -88,6 +88,10 @@ void setup() {
   pinMode(TX1_PIN, INPUT);
   pinMode(RX2_PIN, INPUT);
   pinMode(TX2_PIN, INPUT);
+  ledcSetup(PWM_CHANNEL, 20000, 10); // canal, frequency, resolution
+  ledcAttachPin(PWM_PIN, PWM_CHANNEL); // link GPIO27 to canal
+  pinMode(Pressed_Button_PIN, INPUT);
+  attachInterrupt(digitalPinToInterrupt(ENC_A), encoderISR, RISING);
 
   pinMode(ENC_A, INPUT_PULLUP); 
   attachInterrupt(digitalPinToInterrupt(ENC_A), encoderISR, RISING);  

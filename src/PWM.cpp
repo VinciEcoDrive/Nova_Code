@@ -4,18 +4,18 @@
 
 #pragma region Configuration et Variables
 
-int PWM_CHANNEL = 11; //Attention channel 10 ?
+int PWM_CHANNEL = 11; 
 uint16_t dutyCycle = 5; 
-float kp = 0.07;
+float kp = 0.07; 
 float ki = 18.5;
 float kd = 0.0;
 //float fc;
 float Ts = 0.01; //10ms        
-float alpha = 0.3; //calcAlphaEMA(fc*Ts);      
+float alpha = 0.3; //calcAlphaEMA(fc*Ts); //alpha to filter derivative because the encoder can be noisy  
 float integral = 0;
 float old_ef = 0;
 
-#define PPR 500         //valeur à vérifier
+#define PPR 500      //valeur à vérifier tester à 1024 et 2048 pour voir le rapport précision/saturation.
 volatile long pulse_count = 0;
 unsigned long lastTimeRPM = 0;
 float MotorSpeedreceive = 0; 
@@ -60,17 +60,20 @@ void updateMotorSpeed() { //Calculate motor current speed with encodor impulsion
 
 #pragma region Contrôle PWM
 
+//https://tttapa.github.io/Pages/Arduino/Control-Theory/Motor-Fader/PID-Cpp-Implementation.html inspiration du PID
 void PWM_controle() {
     updateMotorSpeed();
     bool Pressed_Button;
     int threshold = 1000; 
-      int value_Pressed_BUTTON_PIN = analogRead(Pressed_Button_PIN);
-  float voltage_Pressed_Button = (((value_Pressed_BUTTON_PIN * 5) / 4095) *1000);
+    int value_Pressed_BUTTON_PIN = analogRead(Pressed_Button_PIN);
+    float voltage_Pressed_Button = (((value_Pressed_BUTTON_PIN * 5) / 4095) *1000);
 
     if (voltage_Pressed_Button < threshold){ //threshold / security to detect pressed button
       Pressed_Button = false;
     }
     else{ Pressed_Button = true;}
+
+    //if(digitalRead(Pressed_Button_PIN) == HIGH){Pressed_Button = true;} else {Pressed_Button = false;}
        
     if(current < 15) { //Avoid noise
         Pressed_Button = false;

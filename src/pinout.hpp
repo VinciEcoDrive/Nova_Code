@@ -6,15 +6,15 @@
 // DO NOT TOUCH
 
 // #region Sensor Input Pins
-#define Pressed_Button_PIN   39
+#define Pressed_Button_PIN        13
 #define temperature_MOSFET_PIN    34
 #define temperature_batterie_PIN  35
 #define temperature_motor_PIN     32
 #define tension_batterie_PIN      33
-#define tension_motor_PIN         32 //
+#define tension_motor_PIN         32 
 #define current_sensor_PIN        36
 #define button_PIN                13
-#define ENC_A                     10
+#define ENC_A                     26
 // #endregion
 
 // #region Control & Output Pins
