@@ -13,7 +13,7 @@ extern float ki;
 extern float kd;
 extern float Ts;
 extern float alpha;
-
+extern bool Pressed_button;
 extern float integral;
 extern float old_ef;
 

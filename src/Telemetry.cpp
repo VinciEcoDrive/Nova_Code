@@ -56,6 +56,9 @@ void write_DATA(){
   DATA[8] = latitude;                         //with the library
   DATA[9] = dutyCycle;
   DATA[10] = mean(rotation_buffer);
+  DATA[11] = MotorSpeedreceive;
+  DATA[12] = Pressed_button;
+  DATA[13] = (float)dutyCycle;
 }
 
 // Publishes JSON data via MQTT if connected
@@ -74,7 +77,10 @@ void telemetrie(){
     httpRequestData += "\"LONG\":" + String(DATA[7], 6) + ",";
     httpRequestData += "\"LAT\":" + String(DATA[8], 6) + ",";
     httpRequestData += "\"DUTY\":" + String(DATA[9]) + ",";
-    httpRequestData += "\"GYRO\":" + String(DATA[10], 2);
+    httpRequestData += "\"GYRO\":" + String(DATA[10], 2) + ",";
+    httpRequestData += "\"RPM\":" + String(DATA[11]) + ",";
+    httpRequestData += "\"Bouton\":" + String(DATA[12]) + ",";
+    httpRequestData += "\"dutyCycle\":" + String(DATA[13]);
     httpRequestData += "}";
 
   client.publish(MQTT_PUB, httpRequestData.c_str());

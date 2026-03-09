@@ -6,11 +6,11 @@
 
 int PWM_CHANNEL = 10; 
 uint16_t dutyCycle = 5; 
-float kp = 0.07; 
-float ki = 18.5;
+float kp = 0.1; 
+float ki = 0.05; //18.5 donne un Control_signal était supérieur à 1023*
 float kd = 0.0;
 //float fc;
-float Ts = 0.01; //10ms        
+float Ts = 0.2; //200ms        
 float alpha = 0.3; //calcAlphaEMA(fc*Ts); //alpha to filter derivative because the encoder can be noisy  
 float integral = 0;
 float old_ef = 0;
@@ -20,6 +20,7 @@ volatile long pulse_count = 0;
 unsigned long lastTimeRPM = 0;
 float MotorSpeedreceive = 0; 
 float MotorSpeedreference = 4620; // valeur à vérifier
+bool Pressed_button = false;
 
 
 #pragma endregion
@@ -60,85 +61,81 @@ void updateMotorSpeed() { //Calculate motor current speed with encodor impulsion
 
 #pragma region Contrôle PWM
 
-//https://tttapa.github.io/Pages/Arduino/Control-Theory/Motor-Fader/PID-Cpp-Implementation.html inspiration du PID
 void PWM_controle() {
     updateMotorSpeed();
-    bool Pressed_button;
-    if(digitalRead(Pressed_Button_PIN) == HIGH){ //threshold / security to detect pressed button
+    if(digitalRead(Pressed_Button_PIN) == HIGH){ 
+      Pressed_button = true;
+    }
+    else { 
       Pressed_button = false;
     }
-    else{ Pressed_button = true;} 
 
-    //if(digitalRead(Pressed_Button_PIN) == HIGH){Pressed_Button = true;} else {Pressed_Button = false;}
-       
-    if(current < 15) { //Avoid noise
-        Pressed_button = false;
-        dutyCycle = 0;
-    }
-
-    if(current > limited_current) { //security to avoid electrical overload
+    if(current > limited_current) {  //security to avoid electrical overload
         int16_t new_dutyCycle = (int16_t)dutyCycle - (delta * 3);
-         if(new_dutyCycle < 0){
-          dutyCycle = 0;
-         }
-         else{ (uint16_t)new_dutyCycle;}
-        integral = 0; // Reinitialize Pid to 0 
+        if(new_dutyCycle < 0){
+            dutyCycle = 0;
+        }
+        else { 
+            dutyCycle = (uint16_t)new_dutyCycle;
+        }
+        integral = 0; // Réinitialise le PID
     }
     else if(current <= limited_current) {
         if(Pressed_button) {
+            static unsigned long lastTimePID = 0;
+            unsigned long now = millis();
             
-            float error = MotorSpeedreference - MotorSpeedreceive; // difference between wanted and currant speed 
-          
-            float ef = alpha * error + (1 - alpha) * old_ef;
-          
-            float derivative = (ef - old_ef) / Ts; //filtered derivative
-            
-           
-            float next_integral = integral + (error * Ts);  // Integration
-            
-            
-            float Control_signal = (kp * error) + (ki * next_integral) + (kd * derivative); //PID formula
+            if (now - lastTimePID >= (Ts * 1000.0)) { // Ts est en secondes, on convertit en ms
+                lastTimePID = now;
+                
+                float error = MotorSpeedreference - MotorSpeedreceive; 
+                float ef = alpha * error + (1 - alpha) * old_ef;
+                float derivative = (ef - old_ef) / Ts; 
+                
+                float next_integral = integral + (error * Ts);  
+                
+                // Formule PID
+                float Control_signal = (kp * error) + (ki * next_integral) + (kd * derivative); 
 
-            old_ef = ef; //update for next iteration
+                old_ef = ef; 
 
-            
-            if (Control_signal > 1023) { //avoid saturation by limiting the value to 1023
-                dutyCycle = 1023; //set to max value
-            }
-            else if (Control_signal < 0) {
-                dutyCycle = 0;
-                integral = 0;
-            }
-            else {
-                dutyCycle = (uint16_t)Control_signal;
-                integral = next_integral;
+                // Anti-saturation
+                if (Control_signal > 4095) { 
+                    dutyCycle = 4095; 
+                    // Optionnel: on peut geler l'intégrale ici pour éviter le windup
+                }
+                else if (Control_signal < 0) {
+                    dutyCycle = 0;
+                    integral = 0;
+                }
+                else {
+                    dutyCycle = (uint16_t)Control_signal;
+                    integral = next_integral;
+                }
             }
         }
         else {
             integral = 0;
             old_ef = 0;
-            dutyCycle =0;
+            dutyCycle = 0;
         }
     }
 
-    ledcWrite(PWM_CHANNEL, dutyCycle); //send dutyCycle 
+    ledcWrite(PWM_CHANNEL, dutyCycle); 
 }
 
-
 void PWM_controle_slowdown() {
-    uint16_t potentiometer_value = analogRead(Pressed_Button_PIN);
-    if(potentiometer_value < 15) potentiometer_value = 0;
+    
+    uint16_t target_dutyCycle = Pressed_button ? 4095 : 0; 
 
     if(current <= limited_current) {
-        if(dutyCycle < potentiometer_value) {
+        if(dutyCycle < target_dutyCycle) {
             dutyCycle += delta;
+        } else if (dutyCycle > target_dutyCycle) {
+            // Freinage plus lent
+            dutyCycle = (dutyCycle > delta) ? dutyCycle - delta : 0;
         }
     } else {
-        dutyCycle = (dutyCycle > delta) ? dutyCycle - delta : 0;
-    }
-
-    // Freinage plus agressif si on dépasse la consigne
-    if(dutyCycle > potentiometer_value) {
         int16_t new_dutyCycle = (int16_t)dutyCycle - (delta * 5);
         dutyCycle = (new_dutyCycle < 0) ? 0 : (uint16_t)new_dutyCycle;
     }
