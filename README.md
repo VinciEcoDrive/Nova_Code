@@ -39,19 +39,20 @@ git clone https://github.com/VinciEcoDrive/Nova_Code.git
 
 ## CI & Artifacts
 
-This project uses GitHub Actions for Continuous Integration to automatically compile the firmware.
+This project uses GitHub Actions for both Continuous Integration and firmware releases.
 
-### Versioning & Artifacts
-The CI pipeline automatically injects the version number into the firmware:
-- **Tagged Builds:** The firmware filename will be `firmware-vXX.X.X.bin` (matching the tag).
-- **Test Builds:** For regular commits or PRs, the filename will be `firmware-test-build.bin`.
+### Workflows
+- **CI (`build_nova_code.yml`)** runs on Pull Requests and pushes to `main`/`master`.
+- **Release (`release_nova_code.yml`)** runs only when a tag matching `v*` is pushed.
 
-### Downloading the Firmware
-To download the compiled binary without setting up the development environment:
-1. Go to the [Actions Tab](https://github.com/VinciEcoDrive/Nova_Code/actions).
-2. Click on the latest successful workflow run.
-3. Scroll down to the **Artifacts** section.
-4. Download the `firmware-VERSION` zip file (contains the `.bin` file).
+### Versioning & Output Files
+- **CI builds:** Produce a validation artifact named `firmware-ci-<branch>-<date>-<sha>.bin`.
+- **Tagged releases:** Produce `firmware-v<YY>.<MINOR>.<PATCH>.bin` and publish it to GitHub Releases.
+
+### Downloading Firmware
+Use one of the following depending on your goal:
+1. **Production firmware:** Go to [Releases](https://github.com/VinciEcoDrive/Nova_Code/releases) and download the `.bin` asset directly.
+2. **CI validation firmware:** Go to the [Actions Tab](https://github.com/VinciEcoDrive/Nova_Code/actions) and download the artifact from a workflow run (GitHub provides artifacts as `.zip`).
 
 ## Troubleshooting
 
