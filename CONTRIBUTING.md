@@ -18,12 +18,20 @@ We use a standard Feature Branch workflow.
 
 We use **GitHub Actions** to protect the main branch.
 
-* **Automatic Build:** When you open a Pull Request, the server automatically attempts to compile your code.
+* **Automatic Build:** CI runs on every Pull Request and every push to `main`/`master`.
 * **Checks:** You will see a status at the bottom of your PR.
     * ✅ **Green Check:** The code compiles. It is safe to review and merge.
     * ❌ **Red X:** The build failed. You must fix the errors in your branch before merging.
 
 **Do not merge a PR if the CI check has failed.**
+
+### Release Pipeline
+
+Releases are intentionally separate from CI:
+
+* A release is created **only** when a tag matching `v*` is pushed (example: `v26.2.1`).
+* The release workflow builds firmware and publishes a `.bin` file as a GitHub Release asset.
+* Regular PRs and merges never create a GitHub Release.
 
 ## Versioning Strategy
 
@@ -37,9 +45,8 @@ We use **CalVer** (Calendar Versioning) to align with the competition year.
 ## Releasing Firmware
 To generate a "Production Ready" binary file (for example, before a race):
 
-1. Update the version in `platformio.ini`.
-2. Merge your code to main.
-3. Tag the commit on GitHub or via CLI:
+1. Merge your code to `main`.
+2. Tag the target commit on GitHub or via CLI:
 ```bash
 git tag v<YY>.<MINOR>.<PATCH>
 git push origin v<YY>.<MINOR>.<PATCH>
@@ -50,8 +57,8 @@ git tag v26.2.1
 git push origin v26.2.1
 ```
 
-1. The CI pipeline will detect the tag, compile the code, and name the file `firmware-v<MAJOR>.<MINOR>.<PATCH>.bin`. 
-2. Download the binary from the GitHub Actions tab -> Artifacts
+3. The release workflow detects the tag, builds the firmware, and publishes `firmware-v<YY>.<MINOR>.<PATCH>.bin`.
+4. Download the binary from the GitHub **Releases** page.
 
 ## Coding Standards 
 
