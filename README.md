@@ -1,7 +1,7 @@
 # Nova_Code
 
 [![Latest Tag](https://img.shields.io/github/v/tag/VinciEcoDrive/Nova_Code)](https://github.com/VinciEcoDrive/Nova_Code/tags)
-![CI Build Status](https://github.com/VinciEcoDrive/Nova_Code/actions/workflows/build_nova_code.yml/badge.svg)
+![CI Build Status](https://github.com/VinciEcoDrive/Nova_Code/actions/workflows/ci.yml/badge.svg)
 
 This repo contains the source code of our Efficiency Prototype NOVA competing at the [Shell Eco Marathon](https://www.shellecomarathon.com/).
 
@@ -42,7 +42,7 @@ git clone https://github.com/VinciEcoDrive/Nova_Code.git
 This project uses GitHub Actions for both Continuous Integration and firmware releases.
 
 ### Workflows
-- **CI (`build_nova_code.yml`)** runs on Pull Requests and pushes to `main`/`master`.
+- **CI (`ci.yml`)** runs on Pull Requests and pushes to `main`/`master`.
 - **Release (`release_nova_code.yml`)** runs only when a tag matching `v*` is pushed.
 
 ### Versioning & Output Files

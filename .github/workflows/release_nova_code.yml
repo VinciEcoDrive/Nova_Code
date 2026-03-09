@@ -5,7 +5,6 @@ on:
   push:
     tags:
       - "v*"
-  workflow_dispatch:
 
 permissions:
   contents: write
@@ -41,15 +40,10 @@ jobs:
       - name: Install Library Dependencies
         run: pio pkg install
 
-      - name: Inject Version into Code
-        run: |
-          sed -i "s/VERSION=\"[^\"]*\"/VERSION=\"$VERSION\"/g" platformio.ini
-
-          # Print the active version to confirm injection
-          grep VERSION platformio.ini
-
       - name: Build Firmware
-        run: pio run -e esp32doit-devkit-v1
+        run: |
+          export PLATFORMIO_BUILD_FLAGS="-D VERSION=\"$VERSION\""
+          pio run -e esp32doit-devkit-v1
 
       - name: Rename Firmware
         run: mv .pio/build/esp32doit-devkit-v1/firmware.bin firmware-${VERSION}.bin

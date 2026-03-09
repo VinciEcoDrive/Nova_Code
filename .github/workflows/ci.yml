@@ -1,4 +1,4 @@
-name: build_nova_code
+name: ci
 
 # CI workflow: run on PRs and merges/pushes to main/master
 on:
@@ -50,18 +50,12 @@ jobs:
         run: |
           BUILD_ID="ci-${GITHUB_REF_NAME}-$(date +%Y%m%d)-${GITHUB_SHA::7}"
           echo "VERSION=${BUILD_ID}" >> $GITHUB_ENV
-      
-      # Inject Version into Code
-      - name: Inject Version into Code
-        run: |
-          sed -i "s/VERSION=\"[^\"]*\"/VERSION=\"$VERSION\"/g" platformio.ini
-          
-          # Print file content :
-          cat platformio.ini | grep VERSION
 
-      # Compile the firmware
+      # Compile the firmware with VERSION override
       - name: Build Firmware
-        run: pio run -e esp32doit-devkit-v1
+        run: |
+          export PLATFORMIO_BUILD_FLAGS="-D VERSION=\"$VERSION\""
+          pio run -e esp32doit-devkit-v1
 
       # Rename the output firmware file 
       - name: Rename Firmware
