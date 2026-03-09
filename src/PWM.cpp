@@ -4,7 +4,7 @@
 
 #pragma region Configuration et Variables
 
-int PWM_CHANNEL = 16; 
+int PWM_CHANNEL = 10; 
 uint16_t dutyCycle = 5; 
 float kp = 0.07; 
 float ki = 18.5;
