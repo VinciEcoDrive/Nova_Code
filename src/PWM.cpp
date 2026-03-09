@@ -19,9 +19,39 @@ void PWM_controle(){
     dutyCycle = 0;
   }
 
+<<<<<<< Updated upstream
   if(current <= limited_current){                                       //Check if the actual current is not greater than the limit current
     if(dutyCycle < potentiometer_value){                                //Check if the Duty Cycle is lower than the potentiometer value
       dutyCycle += delta;                                               //Add the Delta to the Duty Cycle if all condition are past
+=======
+void IRAM_ATTR encoderISR() {
+  pulse_count++;
+}
+
+float calcAlphaEMA(float fn) {
+    if (fn <= 0) return 1;
+    const float c = std::cos(2 * float(M_PI) * fn);
+    return c - 1 + std::sqrt(c * c - 4 * c + 3);
+}
+
+void updateMotorSpeed() { //Calculate motor current speed with encodor impulsion
+    unsigned long now = millis();
+    unsigned long dt = now - lastTimeRPM;
+
+    if (dt >= 50) { 
+        noInterrupts(); // Protection de la variable volatile
+        long pulses = pulse_count;
+        pulse_count = 0;
+        interrupts();
+
+        MotorSpeedreceive = (float)pulses * (60000.0 / (PPR * dt)); //Convert pulses in Rotation per minutes
+        lastTimeRPM = now;
+
+        // Debug console
+        Serial.print("Vitesse : ");
+        Serial.print(MotorSpeedreceive);
+        Serial.println(" RPM");
+>>>>>>> Stashed changes
     }
   }
   else dutyCycle -= delta;                                              //Remove the Delta to the Duty Cycle if the last condition is not pass

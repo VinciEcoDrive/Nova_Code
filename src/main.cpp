@@ -44,27 +44,24 @@ void IRAM_ATTR button_press(){
 void ECU_task_loop( void * pvParameters ){
   for(;;){
     if (PWM_FLAG) {
-      Serial.println("PWM FLAG");
-      if(PWM_SLOWDOWN) PWM_controle_slowdown();
-      else PWM_controle();
       PWM_FLAG = false;
+      // On lit le courant JUSTE avant le PID pour être à jour
+      get_current(); 
+      
+      if(PWM_SLOWDOWN) PWM_controle_slowdown();
+      else PWM_controle(); 
     }
-
-    get_temperatures();
-    get_tensions();
-    get_current();
-    if(MPU_FLAG) get_mpu();
     write_buffers();
-    if(GPS_TIMER_FLAG){
-        Serial.println("GPS FLAG");
-        get_gps();
-        for(int i = 0; i < speed_buffer_size - 1; i++){
-        speed_buffer[i] = speed_buffer[i + 1]; // shift values to the left
-        }
-        speed_buffer[speed_buffer_size - 1] = speed;
-        GPS_TIMER_FLAG = false;
+    
+    // On ne fait le reste que si on a du temps
+    static uint32_t lastSlowCheck = 0;
+    if (millis() - lastSlowCheck > 100) { // Tous les 100ms seulement
+        get_temperatures();
+        get_tensions();
+        lastSlowCheck = millis();
     }
-    vTaskDelay(10);
+    
+    vTaskDelay(1); // Délai minimal pour laisser le Watchdog respirer
   }
 }
 #pragma endregion

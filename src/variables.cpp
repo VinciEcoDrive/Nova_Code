@@ -12,7 +12,7 @@ bool BUTTON = false;             //Steering wheel button press
 
 #pragma region Feature Flags
 // Enable/disable optional system features
-bool PWM_SLOWDOWN = true;        //Enable safer deceleration
+bool PWM_SLOWDOWN = false;        //Enable safer deceleration
 bool DEBUG = true;               //Debug or driver mode
 bool SERVER = true;              //Enable telemetry transmission
 bool GPS_FLAG = true;            //Enable GPS module
