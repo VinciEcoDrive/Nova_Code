@@ -66,31 +66,22 @@ void telemetrie(){
   //Check if the WIFI is well connected
   if(WiFi.status()== WL_CONNECTED && client.connected()){
     client.loop();
-
-    float tmot = constrain(DATA[0], 20.0, 50.0);
-    float tbat = constrain(DATA[1], 20.0, 50.0);
-    float tmos = constrain(DATA[2], 20.0, 50.0);
-    float vmot = constrain(DATA[3], 30.0, 52.0);
-    float vbat = constrain(DATA[4], 30.0, 52.0);
-    float cur  = constrain(DATA[5], 0.0, 15.0); //15 à vérifier 
-    float duty = constrain(DATA[9], 0.0, 4095.0);
-    float rpm  = constrain(DATA[11], 0.0, 10000.0);
-    int button = (DATA[12] > 0) ? 1 : 0; // 1 if High, otherwise 0
+  
 
     String httpRequestData = "{";
-    httpRequestData += "\"TMOT\":" + String(tmot, 2) + ",";
-    httpRequestData += "\"TBAT\":" + String(tbat, 2) + ",";
-    httpRequestData += "\"TMOS\":" + String(tmos, 2) + ",";
-    httpRequestData += "\"VMOT\":" + String(vmot, 2) + ",";
-    httpRequestData += "\"VBAT\":" + String(vbat, 2) + ",";
-    httpRequestData += "\"CUR\":"  + String(cur, 2) + ",";
+    httpRequestData += "\"TMOT\":" + String(DATA[0], 2) + ",";
+    httpRequestData += "\"TBAT\":" + String(DATA[1], 2) + ",";
+    httpRequestData += "\"TMOS\":" + String(DATA[2], 2) + ",";
+    httpRequestData += "\"VMOT\":" + String(DATA[3], 2) + ",";
+    httpRequestData += "\"VBAT\":" + String(DATA[4], 2) + ",";
+    httpRequestData += "\"CUR\":"  + String(DATA[5], 2) + ",";
     httpRequestData += "\"S\":"    + String(DATA[6], 2) + ",";
     httpRequestData += "\"LONG\":" + String(DATA[7], 6) + ",";
     httpRequestData += "\"LAT\":"  + String(DATA[8], 6) + ",";
-    httpRequestData += "\"DUTY\":" + String(duty, 4) + ",";
+    httpRequestData += "\"DUTY\":" + String(DATA[9], 4) + ",";
     httpRequestData += "\"GYRO\":" + String(DATA[10], 2) + ","; 
-    httpRequestData += "\"RPM\":"  + String(rpm, 3) + ",";
-    httpRequestData += "\"BUT\":"  + String(button); 
+    httpRequestData += "\"RPM\":"  + String(DATA[11], 3) + ",";
+    httpRequestData += "\"BUT\":"  + String(DATA[12]); 
     httpRequestData += "}";
 
   client.publish(MQTT_PUB, httpRequestData.c_str());
