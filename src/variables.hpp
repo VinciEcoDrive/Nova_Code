@@ -7,7 +7,7 @@
 // #define wifi_name       "Shell Eco-marathon" //"R-Toukour" // //"OnePlus 8T" //   //"Miti-phone"  //PoleDeVinci_IFT"Antoine's iPhone"
 // #define wifi_password   "" //"uhcd2281"////     "00000000"//"Tbucsi123"   //*c.r4UV@VfPn_0 "Antoine2"
 #define MQTT_PORT       1883
-#define MQTT_PUB        "telemetrie/pe"
+#define MQTT_PUB        "telemetry/data"
 #pragma endregion
 
 #pragma region System Flags
