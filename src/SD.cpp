@@ -12,7 +12,7 @@
 String path;
 File fileSD;
 uint8_t indexSD = 0;
-float DATA[11] = {0}; // TMOT-TBAT-TMOS-VMOT-VBAT-CUR-SPD-LNG-LAT-DTY-GYRO
+float DATA[13] = {0}; // TMOT-TBAT-TMOS-VMOT-VBAT-CUR-SPD-LNG-LAT-DTY-GYRO
 #pragma endregion
 
 #pragma region SD Card Functions

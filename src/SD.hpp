@@ -10,7 +10,7 @@ extern String path;
 extern File fileSD;
 extern uint8_t indexSD;
 // TMOT-TBAT-TMOS-VMOT-VBAT-CUR-SPD-LNG-LAT-DTY-GYRO
-extern float DATA[13];
+extern float DATA[];
 #pragma endregion
 
 #pragma region SD Card Functions
