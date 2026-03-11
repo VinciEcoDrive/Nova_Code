@@ -2,6 +2,7 @@
 #include <TinyGPS++.h>
 #include <Wire.h>
 #include <MPU9250.h>
+#include <HardwareSerial.h>
 
 #ifndef SENSOR_HPP
 #define SENSOR_HPP
@@ -39,8 +40,8 @@ extern float current_buffer[LIST_SIZE];
 extern float current;
 extern float rotation_buffer[LIST_SIZE];
 extern float rotation;
-extern float latitude;
-extern float longitude;
+extern double latitude;
+extern double longitude;
 const uint8_t speed_buffer_size = 5;
 extern float speed_buffer[speed_buffer_size];
 extern float speed;
