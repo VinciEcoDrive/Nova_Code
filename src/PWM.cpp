@@ -72,9 +72,9 @@ void PWM_controle() {
 
 
     if(current <= limited_current) {
+        static unsigned long lastTimePID = 0;
+        unsigned long now = millis();
         if(Pressed_button) {
-            static unsigned long lastTimePID = 0;
-            unsigned long now = millis();
             
             if (now - lastTimePID >= (Ts * 1000.0)) { // Ts est en secondes, on convertit en ms
                 lastTimePID = now;
@@ -105,9 +105,11 @@ void PWM_controle() {
                 }
             }
         }
-        else {
+        else if (now - lastTimePID >= (2000)){
             integral = 0;
             old_ef = 0;
+        }
+        else {
             dutyCycle = 0;
         }
     }
