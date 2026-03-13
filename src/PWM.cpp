@@ -70,17 +70,8 @@ void PWM_controle() {
       Pressed_button = false;
     }
 
-    if(current > limited_current) {  //security to avoid electrical overload
-        int16_t new_dutyCycle = (int16_t)dutyCycle - (delta * 3);
-        if(new_dutyCycle < 0){
-            dutyCycle = 0;
-        }
-        else { 
-            dutyCycle = (uint16_t)new_dutyCycle;
-        }
-        integral = 0; // Réinitialise le PID
-    }
-    else if(current <= limited_current) {
+
+    if(current <= limited_current) {
         if(Pressed_button) {
             static unsigned long lastTimePID = 0;
             unsigned long now = millis();
@@ -93,7 +84,7 @@ void PWM_controle() {
                 float derivative = (ef - old_ef) / Ts; 
                 
                 float next_integral = integral + (error * Ts);  
-                
+                 
                 // Formule PID
                 float Control_signal = (kp * error) + (ki * next_integral) + (kd * derivative); 
 
