@@ -18,26 +18,42 @@ float DATA[13] = {0}; // TMOT-TBAT-TMOS-VMOT-VBAT-CUR-SPD-LNG-LAT-DTY-GYRO
 #pragma region SD Card Functions
 // Sets up SD card & creates new CSV file
 void init_SD_card(){
-  if(!SD.begin(CS_PIN)){return;}                                        //Begin the communication
-  indexSD = 0;                                                  //Set index to 0
-  while (SD.exists("data" + String(indexSD) + ".csv")) indexSD++;       //Look for the last dataX.csv file
-  path = "data" + String(indexSD) + ".csv";
-  fileSD = SD.open(path, FILE_WRITE);      //Create a new data(X+1).csv
-  fileSD.println("TMOT;TBAT;TMOS;VMOT;VBAT;CUR;SPD;LNG;LAT;DTY;GYR");   //Print the header of the csv
+  if(!SD.begin(CS_PIN)){
+    Serial.println("Erreur de carte SD !");
+    return;
+  }
+  
+  indexSD = 0;
+  // Ajout du "/" pour la racine
+  while (SD.exists("/data" + String(indexSD) + ".csv")) indexSD++;
+  path = "/data" + String(indexSD) + ".csv";
+
+  fileSD = SD.open(path, FILE_WRITE);
+  if(fileSD){
+    fileSD.println("TMOT;TBAT;TMOS;VMOT;VBAT;CUR;SPD;LNG;LAT;DTY;GYR");
+    fileSD.close(); // On ferme immédiatement
+    Serial.println("Fichier cree : " + path);
+  } else {
+    Serial.println("Impossible de creer le fichier !");
+  }
 }
 
-// Appends sensor data row to CSV
 void write_SD_card(){
-  String data_SD = "";                            //Init the sd card message as an empty string
+  String data_SD = "";
   for(int i = 0; i < 11; i++){
-    data_SD += String(DATA[i], 6) + ";";          //Write all the sensor value with a ';' as separator
+    data_SD += String(DATA[i], 2) + ";"; // 2 decimales suffisent souvent
   }
-  data_SD.remove(data_SD.length() - 1);           //Remove the last ';'
+  data_SD.remove(data_SD.length() - 1);
 
-  fileSD = SD.open(path, FILE_WRITE);    //Oper the file we create during the initiation
+  // Utilisation de FILE_APPEND pour ne pas effacer le contenu existant
+  fileSD = SD.open(path, FILE_APPEND); 
   if(fileSD){
-    fileSD.println(data_SD);                                          //Write the message
-    fileSD.close();                                                   //Close the file
+    if(fileSD.println(data_SD)){
+       // Optionnel : fileSD.flush(); // Force l'ecriture physique
+    }
+    fileSD.close();
+  } else {
+    Serial.println("Erreur d'ouverture lors de l'ecriture");
   }
 }
 #pragma endregion
