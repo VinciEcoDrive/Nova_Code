@@ -60,7 +60,7 @@ void updateMotorSpeed() { //Calculate motor current speed with encodor impulsion
 #pragma endregion
 
 #pragma region Contrôle PWM
-
+static unsigned long lastTimePID = 0;
 void PWM_controle() {
     updateMotorSpeed();
     if(digitalRead(Pressed_Button_PIN) == HIGH){ 
@@ -72,7 +72,7 @@ void PWM_controle() {
 
 
     if(current <= limited_current) {
-        static unsigned long lastTimePID = 0;
+        
         unsigned long now = millis();
         if(Pressed_button) {
             
@@ -105,13 +105,20 @@ void PWM_controle() {
                 }
             }
         }
-        else if (now - lastTimePID >= (2000)){
-            integral = 0;
-            old_ef = 0;
-        }
         else {
             dutyCycle = 0;
+            if (now - lastTimePID >= 2000) {
+                integral = 0;
+                old_ef = 0;
+                lastTimePID = now;
+            }
         }
+    }
+    else{
+        integral = 0;
+        old_ef = 0;
+        dutyCycle = 0;
+        lastTimePID = 0;   
     }
 
     ledcWrite(PWM_CHANNEL, dutyCycle); 
