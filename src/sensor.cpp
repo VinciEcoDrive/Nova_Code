@@ -106,7 +106,6 @@ float dmm_to_decimal(String coord, String direction) {
   }
   return decimal;
 }
-
 // Parses GPS NMEA RMC & GGA sentences
 void get_gps(){
   String trame = "";

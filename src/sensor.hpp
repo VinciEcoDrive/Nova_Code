@@ -3,6 +3,7 @@
 #include <TinyGPS++.h>
 #include <Wire.h>
 #include <MPU9250.h>
+#include <HardwareSerial.h>
 
 #ifndef SENSOR_HPP
 #define SENSOR_HPP

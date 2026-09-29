@@ -76,7 +76,7 @@ void setup() {
   Wire.begin();
   Serial.println("Start setup");
 
-  pinMode(speed_potentiometer_PIN, INPUT);
+  pinMode(Pressed_Button_PIN, INPUT);
   pinMode(temperature_MOSFET_PIN, INPUT);
   pinMode(temperature_batterie_PIN, INPUT);
   // pinMode(temperature_motor_PIN, INPUT);
@@ -88,14 +88,16 @@ void setup() {
   pinMode(TX1_PIN, INPUT);
   pinMode(RX2_PIN, INPUT);
   pinMode(TX2_PIN, INPUT);
+  pinMode(ENC_A, INPUT_PULLUP); 
+  attachInterrupt(digitalPinToInterrupt(ENC_A), encoderISR, RISING);  
 
   pinMode(PWM_PIN, OUTPUT);
   ledcSetup(PWM_CHANNEL, 17200, 12);
   ledcAttachPin(PWM_PIN, PWM_CHANNEL);                     //Attach the PWM pin to generate a PWM signal, frequency : 17200, resolution: 12 (nb of bits)
   Serial.println("PWM pin attached");
 
-  pinMode(button_PIN, INPUT);
-  attachInterrupt(digitalPinToInterrupt(button_PIN), button_press, RISING); //Attach the steering wheel button to interrupt
+  pinMode(Pressed_Button_PIN, INPUT);
+  attachInterrupt(digitalPinToInterrupt(Pressed_Button_PIN), button_press, RISING); //Attach the steering wheel button to interrupt
   Serial.println("Pin interrupt button");
 
   timer_data = timerBegin(0, 80, true);                          // Timer 0, clock divisor 80

@@ -17,8 +17,17 @@ uint8_t httpResponseCode = 0;   //Server response code
 #pragma endregion
 
 #pragma region MQTT Configuration
-const char* mqtt_server = "5.250.176.118";
+const char* mqtt_server = "37.59.113.108";
 const char* mqtt_client_id = "ESP32Client";
+#pragma endregion
+
+#pragma region MQTT stable connexion
+float Ts_mqtt = 15; //Time to configure for every check
+static unsigned long last_time_mqtt = 0;
+unsigned long current_time_mqtt = 0;
+static unsigned long state_time = 0;
+enum MQTT_STATE {IDLE, WIFI_CONNECTING, MQTT_CONNECTING};
+static MQTT_STATE mqtt_state = IDLE;
 #pragma endregion
 
 #pragma region Telemetry Functions
@@ -56,6 +65,9 @@ void write_DATA(){
   DATA[8] = latitude;                         //with the library
   DATA[9] = dutyCycle;
   DATA[10] = mean(rotation_buffer);
+  DATA[11] = MotorSpeedreceive;
+  DATA[12] = Pressed_button;
+  
 }
 
 // Publishes JSON data via MQTT if connected
@@ -63,18 +75,22 @@ void telemetrie(){
   //Check if the WIFI is well connected
   if(WiFi.status()== WL_CONNECTED && client.connected()){
     client.loop();
-    String httpRequestData = "{";                                 //Start a new string to store the json message to send
+  
+
+    String httpRequestData = "{";
     httpRequestData += "\"TMOT\":" + String(DATA[0], 2) + ",";
     httpRequestData += "\"TBAT\":" + String(DATA[1], 2) + ",";
     httpRequestData += "\"TMOS\":" + String(DATA[2], 2) + ",";
     httpRequestData += "\"VMOT\":" + String(DATA[3], 2) + ",";
     httpRequestData += "\"VBAT\":" + String(DATA[4], 2) + ",";
-    httpRequestData += "\"CUR\":" + String(DATA[5], 2) + ",";
-    httpRequestData += "\"S\":" + String(DATA[6], 2) + ",";
+    httpRequestData += "\"CUR\":"  + String(DATA[5], 2) + ",";
+    httpRequestData += "\"S\":"    + String(DATA[6], 2) + ",";
     httpRequestData += "\"LONG\":" + String(DATA[7], 6) + ",";
-    httpRequestData += "\"LAT\":" + String(DATA[8], 6) + ",";
-    httpRequestData += "\"DUTY\":" + String(DATA[9]) + ",";
-    httpRequestData += "\"GYRO\":" + String(DATA[10], 2);
+    httpRequestData += "\"LAT\":"  + String(DATA[8], 6) + ",";
+    httpRequestData += "\"DUTY\":" + String(DATA[9], 4) + ",";
+    httpRequestData += "\"GYRO\":" + String(DATA[10], 2) + ","; 
+    httpRequestData += "\"RPM\":"  + String(DATA[11], 3) + ",";
+    httpRequestData += "\"BUT\":"  + String(DATA[12]); 
     httpRequestData += "}";
 
   client.publish(MQTT_PUB, httpRequestData.c_str());
@@ -106,16 +122,67 @@ void wifi_mqtt_connection(){
   }
   Serial.println("MQTT linked");
 }
+
+void wifi_mqtt_reconnection(){
+  if(!SERVER) return;
+
+  current_time_mqtt = millis();
+
+  switch(mqtt_state){
+    case IDLE:
+    if(current_time_mqtt - last_time_mqtt > (unsigned long)Ts_mqtt * 1000){
+      last_time_mqtt = current_time_mqtt;
+      if(WiFi.status() != WL_CONNECTED){
+        WiFi.reconnect();
+        state_time = current_time_mqtt;
+        mqtt_state = WIFI_CONNECTING;
+      }
+      else if(!client.connected()){
+        client.setServer(mqtt_server, MQTT_PORT);
+        state_time = current_time_mqtt;
+        mqtt_state = MQTT_CONNECTING;
+      }
+      break;
+    }
+    
+    case WIFI_CONNECTING:
+      if(WiFi.status() == WL_CONNECTED){
+        Serial.println("Connected to WIFI");
+        client.setServer(mqtt_server, MQTT_PORT);
+        state_time = current_time_mqtt;
+        mqtt_state = MQTT_CONNECTING;
+      }
+      else if(current_time_mqtt - state_time > 10000){
+       Serial.println("Fail to connect WIFI");
+       mqtt_state = IDLE; 
+      }
+      break;
+    
+    case MQTT_CONNECTING:
+      if(client.connect(mqtt_client_id)){
+        Serial.println("MQTT linked");
+        mqtt_state = IDLE;
+      }
+      else if(current_time_mqtt - state_time > 10000){
+        Serial.println("Fail to link MQTT");
+        mqtt_state = IDLE;
+      }
+      break;
+  }
+
+}
 #pragma endregion
 
 #pragma region Task Loop
 // Main telemetry task loop for data transmission
 void telemetrie_task_loop(void *pvParameters) {
   for(;;){
+    wifi_mqtt_reconnection();
+    
     if(DATA_FLAG){
       Serial.println("DATA FLAG");
       write_DATA();
-
+      
       if(SERVER) telemetrie();
       if(SD_FLAG) write_SD_card();
 
