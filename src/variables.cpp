@@ -4,10 +4,10 @@
 
 #pragma region System Flags
 // Interrupt flags for timing & control events
-bool DATA_FLAG = true;          //Flag to send data to telemetry
-bool GPS_TIMER_FLAG = false;     //GPS update timer flag
-bool PWM_FLAG = false;           //PWM control timer flag
-bool BUTTON = false;             //Steering wheel button press
+volatile bool DATA_FLAG = true;          //Flag to send data to telemetry
+volatile bool GPS_TIMER_FLAG = false;     //GPS update timer flag
+volatile bool PWM_FLAG = false;           //PWM control timer flag
+volatile bool BUTTON = false;             //Steering wheel button press
 #pragma endregion
 
 #pragma region Feature Flags

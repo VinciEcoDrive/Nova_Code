@@ -1,8 +1,6 @@
 #include <Arduino.h>
 #include <SPI.h>
 #include <FS.h>
-#include <FSImpl.h>
-#include <vfs_api.h>
 #include <HardwareSerial.h>
 #include "variables.hpp"
 #include "pinout.hpp"
@@ -88,45 +86,40 @@ void setup() {
   pinMode(TX1_PIN, INPUT);
   pinMode(RX2_PIN, INPUT);
   pinMode(TX2_PIN, INPUT);
-  pinMode(ENC_A, INPUT_PULLUP); 
-  attachInterrupt(digitalPinToInterrupt(ENC_A), encoderISR, RISING);  
+  pinMode(ENC_A, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(ENC_A), encoderISR, RISING);
 
   pinMode(PWM_PIN, OUTPUT);
-  ledcSetup(PWM_CHANNEL, 17200, 12);
-  ledcAttachPin(PWM_PIN, PWM_CHANNEL);                     //Attach the PWM pin to generate a PWM signal, frequency : 17200, resolution: 12 (nb of bits)
+  ledcAttach(PWM_PIN, 17200, 12);                     //Attach the PWM pin to generate a PWM signal, frequency : 17200, resolution: 12 (nb of bits)
   Serial.println("PWM pin attached");
 
   pinMode(Pressed_Button_PIN, INPUT);
   attachInterrupt(digitalPinToInterrupt(Pressed_Button_PIN), button_press, RISING); //Attach the steering wheel button to interrupt
   Serial.println("Pin interrupt button");
 
-  timer_data = timerBegin(0, 80, true);                          // Timer 0, clock divisor 80
-  timerAttachInterrupt(timer_data, &timer_interrupt, true);        // Attach the interrupt handling function
-  timerAlarmWrite(timer_data, 500000, true);
+  timer_data = timerBegin(1000000);                        // Timer 0, clock divisor 80
+  timerAttachInterrupt(timer_data, &timer_interrupt);        // Attach the interrupt handling function
+  timerAlarm(timer_data, 500000, true, 0);
 // Interrupt every 0.5 second
   Serial.println("Timer DATA setup");
 
-  timer_gps = timerBegin(1, 80, true);                          // Timer 0, clock divisor 80
-  timerAttachInterrupt(timer_gps, &gps_interrupt, true);        // Attach the interrupt handling function
-  timerAlarmWrite(timer_gps, 100000, true);
+  timer_gps = timerBegin(1000000);                        // Timer 0, clock divisor 80
+  timerAttachInterrupt(timer_gps, &gps_interrupt);        // Attach the interrupt handling function
+  timerAlarm(timer_gps, 100000, true, 0);
                  // Interrupt every 0.1 second
   Serial.println("Timer GPS setup");
 
-  timer_PWM = timerBegin(2, 80, true);                          // Timer 0, clock divisor 80
-  timerAttachInterrupt(timer_PWM, &PWM_interrupt, true);        // Attach the interrupt handling function
-  timerAlarmWrite(timer_PWM, 10000, true);
+  timer_PWM = timerBegin(1000000);                        // Timer 0, clock divisor 80
+  timerAttachInterrupt(timer_PWM, &PWM_interrupt);        // Attach the interrupt handling function
+  timerAlarm(timer_PWM, 10000, true, 0);
                    // Interrupt every 0.1 second
-  Serial.println("Timer GPS setup");
+  Serial.println("Timer PWM setup");
 
 
   if(SERVER) wifi_mqtt_connection();
   if(GPS_FLAG) gpsSerial.begin(9600, SERIAL_8N1, RX2_PIN, TX2_PIN);  //Start the NEO-6M GPS with 9600 bauds with the UART2 connection
   if(MPU_FLAG) mpu.setup(0x68);                                    // Default I2C adress of the MPU9250
   if(SD_FLAG) init_SD_card();
-
-  timerAlarmEnable(timer_PWM);
-  timerAlarmEnable(timer_gps);
-  timerAlarmEnable(timer_data);
 
   xTaskCreatePinnedToCore(telemetrie_task_loop,"Telemetrie",10000,NULL,1,&telemetrie_task,0);
   delay(100);
